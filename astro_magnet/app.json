@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "astromagnet",
+    "slug": "astromagnet",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/app_logo.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/background.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#9A48D0"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.astromagnet.astromagnet"
+    },
+    "android": {
+      "googleServicesFile": "./firebaseConfiguration/google-services.json",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "package": "com.astromagnet.astromagnet"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "8187c5d7-248f-450a-8896-6f75904a5d57"
+      }
+    }
+  }
+}
