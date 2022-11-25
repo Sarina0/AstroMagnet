@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "152417074645",
+    "project_id": "astro-magnet-pro",
+    "storage_bucket": "astro-magnet-pro.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:152417074645:android:3d34f9bb4ac631f9f1115c",
+        "android_client_info": {
+          "package_name": "com.astro.magnet.pro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "152417074645-bv986vku07nenh7a4fp9ii1bnfcgcj8t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.astro.magnet.pro",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "152417074645-2mlas6ru20ejnv93sap4k549d98fsk4k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCw9f2DJHBI-gfNUZ_PTgr2izwnhHaTtT0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "152417074645-2mlas6ru20ejnv93sap4k549d98fsk4k.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "152417074645-a8n3k90mj4da9t0gbprjs15pave753sb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.astro.magnet.pro"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

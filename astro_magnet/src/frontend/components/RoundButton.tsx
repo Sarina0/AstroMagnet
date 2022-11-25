@@ -3,7 +3,7 @@ import { ReactNode } from 'react'
 
 interface Props {
     title: string;
-    onPress: Function,
+    onPress: () => void;
     style: Object,
 }
 

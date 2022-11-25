@@ -1,8 +1,3 @@
-import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin'
-import { FirebaseAuthTypes } from "@react-native-firebase/auth"
-import auth from '@react-native-firebase/auth';
-import {Platform} from 'react-native'
-import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
 import Messages from "../../theme/messages";
 

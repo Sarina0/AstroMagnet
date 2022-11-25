@@ -5,22 +5,24 @@ import {
     Image, TextInput, FlatList,
 
 } from 'react-native'
-import React, {useEffect, useState} from "react";
+import {useEffect, useState, useContext} from "react";
 import FastImage from "react-native-fast-image";
-
-import { ColorPalette } from '../../styles/colorPalette'
-import Images from "../../../theme/images";
-import {state} from "../../../store";
-import {UserController} from "../../../controller/user";
-import EmptyView from "../../components/EmptyView";
+import { ColorPalette } from '@app/frontend/styles/colorPalette'
+import Images from "@app/theme/images";
+import {UserContext} from "@app/store/user";
+import {UserController} from "@app/controller/user";
+import EmptyView from "@app/frontend/components/EmptyView";
+import { User } from '@app/shared/interfaces/user';
 
 const LikedScreen = () => {
-    const [users, setUsers] = useState([]);
-    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [users, setUsers] = useState<any>([]);
+    const [filteredUsers, setFilteredUsers] = useState<any>([]);
     const [loading, setLoading] = useState(false);
     const [keyword, setKeyword] = useState('');
 
-    const currentUser = state.user.currentUser;
+    const {profile: currentUser} = useContext(UserContext) as {
+        profile: User
+    }
 
     const loadLikeUsers = async () => {
         setLoading(true);
@@ -28,9 +30,9 @@ const LikedScreen = () => {
         const likeUsers = [];
         for (const user of _users) {
             const userId = user._ref._documentPath._parts[1];
-            if (userId !== currentUser.userId) {
-                const like = currentUser.like || [];
-                const dislike = currentUser.dislike || [];
+            if (userId !== currentUser.id) {
+                const like = currentUser.liked || [];
+                const dislike = currentUser.disliked || [];
                 const likeIndex = like.indexOf(userId);
                 if (likeIndex >= 0) {
                     likeUsers.push({
@@ -45,10 +47,10 @@ const LikedScreen = () => {
         setFilteredUsers(likeUsers);
     }
 
-    const onSearchUser = (text) => {
+    const onSearchUser = (text: string) => {
         setKeyword(text);
         if (text) {
-            const filtered = users.filter((item) => item.name.indexOf(text) >= 0);
+            const filtered = users.filter((item: User) => item.name!.indexOf(text) >= 0);
             setFilteredUsers(filtered);
         } else {
             setFilteredUsers(users);
@@ -82,7 +84,7 @@ const LikedScreen = () => {
                     data={filteredUsers}
                     keyExtractor={(item, index) => index.toString()}
                     ListFooterComponent={() => <View style={{ height: 20 }} />}
-                    renderItem={({ item, i }) => {
+                    renderItem={({ item }) => {
                         return (
                             <View style={styles.userCell}>
                                 <FastImage style={styles.avatar} source={item.profilePicture ? {uri: item.profilePicture} : Images.avatar_placeholder} />

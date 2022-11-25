@@ -5,25 +5,29 @@ import {
     Image,
     Dimensions
 } from 'react-native'
-import React, {useEffect, useState} from "react";
+import {useEffect, useState, useContext} from "react";
 import FastImage from "react-native-fast-image";
 
-import {UserController} from "../../../controller/user";
-import {ColorPalette} from "../../styles/colorPalette";
-import Images from "../../../theme/images";
-import {state} from "../../../store";
-import LoadingOverlay from "../../components/LoadingOverlay";
-import EmptyView from "../../components/EmptyView";
+import {UserController} from "@app/controller/user";
+import {ColorPalette} from "@app/frontend/styles/colorPalette";
+import Images from "@app/theme/images";
+import {UserContext} from "@app/store/user";
+import LoadingOverlay from "@app/frontend/components/LoadingOverlay";
+import EmptyView from "@app/frontend/components/EmptyView";
+import { User } from '@app/shared/interfaces/user';
 
 const width = Dimensions.get('window').width;
 
 const LookingScreen = () => {
-    const [users, setUsers] = useState([]);
+    const [users, setUsers] = useState<any>([]);
     const [loading, setLoading] = useState(false);
-    const [activeUser, setActiveUser] = useState(null);
+    const [activeUser, setActiveUser] = useState<any>(null);
     const [activeUserIndex, setActiveUserIndex] = useState(0);
 
-    const currentUser = state.user.currentUser;
+    const {profile: currentUser, setProfile} = useContext(UserContext) as {
+        profile: User,
+        setProfile: (profile: User) => void
+    }
 
     const loadAllUsers = async () => {
         setLoading(true);
@@ -31,9 +35,9 @@ const LookingScreen = () => {
         const allUsers = [];
         for (const user of _users) {
             const userId = user._ref._documentPath._parts[1];
-            if (userId !== currentUser.userId) {
-                const like = currentUser.like || [];
-                const dislike = currentUser.dislike || [];
+            if (userId !== currentUser.id) {
+                const like = currentUser.liked || [];
+                const dislike = currentUser.disliked || [];
                 const likeIndex = like.indexOf(userId);
                 const dislikeIndex = dislike.indexOf(userId);
                 if (likeIndex < 0 && dislikeIndex < 0) {
@@ -69,13 +73,13 @@ const LookingScreen = () => {
                 }
             }, 300);
 
-            await UserController.likeUser(currentUser.userId, likeUser)
-            const likes = currentUser.like || [];
+            await UserController.likeUser(currentUser.id, likeUser)
+            const likes = currentUser.liked || [];
             likes.push(likeUser);
-            state.user.currentUser = {
+            setProfile({
                 ...currentUser,
-                like: likes
-            };
+                liked: likes
+            })
             setLoading(false);
         }
     }
@@ -97,13 +101,13 @@ const LookingScreen = () => {
                 }
             }, 300);
 
-            await UserController.dislikeUser(currentUser.userId, dislikeUser)
-            const dislikes = currentUser.dislike || [];
+            await UserController.dislikeUser(currentUser.id, dislikeUser)
+            const dislikes = currentUser.disliked || [];
             dislikes.push(dislikeUser);
-            state.user.currentUser = {
+            setProfile({
                 ...currentUser,
-                dislike: dislikes
-            };
+                disliked: dislikes
+            })
             setLoading(false);
         }
     }
@@ -118,12 +122,11 @@ const LookingScreen = () => {
         setActiveUserIndex(activeUserIndex - 1);
     }
 
-    const toRad = Value => {
+    const toRad = (Value:any) => {
         return (Value * Math.PI) / 180;
     };
 
-    const getCompatibility = (user) => {
-        const currentUser = state.user.currentUser;
+    const getCompatibility = (user:any) => {
         if (currentUser && user) {
             let lat1 = currentUser.lat;
             let lng1 = currentUser.lng;
@@ -131,8 +134,8 @@ const LookingScreen = () => {
             let lng2 = user.lng;
 
             let R = 6371; // km
-            let dLat = toRad(lat2 - lat1);
-            let dLon = toRad(lng2 - lng1);
+            let dLat = toRad(lat2 - lat1!);
+            let dLon = toRad(lng2 - lng1!);
             lat1 = toRad(lat1);
             lat2 = toRad(lat2);
 
@@ -147,7 +150,7 @@ const LookingScreen = () => {
     }
 
     const getAge = () => {
-        const birthYear = new Date(activeUser.dateAndTimeOfBirth).getFullYear();
+        const birthYear = new Date(activeUser!.dateAndTimeOfBirth!).getFullYear();
         const curYear= new Date().getFullYear();
         return curYear - birthYear;
     }
@@ -169,13 +172,13 @@ const LookingScreen = () => {
                           <TouchableOpacity onPress={onPrevUser}>
                               <Image style={styles.arrowImage} source={Images.icon_arrow_left}/>
                           </TouchableOpacity>
-                        ) : <Image style={styles.arrowImage} />}
+                        ) : <Image style={styles.arrowImage} source={Images.icon_arrow_right} />}
                         <Text style={styles.nameText}>{activeUser.name || ''}</Text>
                         {activeUserIndex < users.length - 1 ? (
                             <TouchableOpacity onPress={onNextUser}>
                                 <Image style={styles.arrowImage} source={Images.icon_arrow_right}/>
                             </TouchableOpacity>
-                        ) : <Image style={styles.arrowImage} />}
+                        ) : <Image style={styles.arrowImage}  source={Images.icon_arrow_left}/>}
                     </View>
                     <View style={styles.compatibilityWrapper}>
                         <Text style={styles.compatibilityText}>Compatibility: {getCompatibility(activeUser)}%</Text>

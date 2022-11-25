@@ -3,36 +3,35 @@ import {
     Text, TouchableOpacity,
     View,
 } from 'react-native'
-import React, {useEffect, useState} from "react";
+import {useEffect, useState, useContext} from "react";
 
-import Background from '../../components/background'
-import PageHeader from '../../components/header'
+import Background from '@app/frontend/components/background'
+import PageHeader from '@app/frontend/components/header'
 import SelectScreen from "./SelectScreen";
 import LikedScreen from "./LikedScreen";
 import LookingScreen from "./LookingScreen";
 
-import { HOME_PAGES } from "../../../config";
-import { ColorPalette } from '../../styles/colorPalette'
-import RoundButton from "../../components/RoundButton";
+import { HOME_PAGES } from "@app/config";
+import { ColorPalette } from "@app/frontend/styles/colorPalette";
+import RoundButton from "@app/frontend/components/RoundButton";
 import * as Location from "expo-location";
-import {state} from "../../../store";
-import {UserController} from "../../../controller/user";
+import {UserContext} from "@app/store/user";
+import {UserController} from "@app/controller/user";
 
 
 const HomeScreen = () => {
     const [activePage, setActivePage] = useState(HOME_PAGES.HOME);
     const [location, setLocation] = useState(null);
-    const [errorMsg, setErrorMsg] = useState(null);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const {profile: currentUser} = useContext(UserContext);
 
-
-    const onRedirectPage = (page) => {
+    const onRedirectPage = (page: any) => {
         setActivePage(page);
     }
 
-    const updateGeoLocation = async (location) => {
-        const currentUser = state.user.currentUser;
+    const updateGeoLocation = async (location: any) => {
         if (currentUser) {
-            const userId = currentUser.userId;
+            const userId = currentUser.id;
             const data = {
                 lat: location.coords.latitude,
                 lng: location.coords?.longitude

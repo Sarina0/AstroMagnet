@@ -1,4 +1,5 @@
-import React, {useRef, useState, useEffect} from 'react';
+import {useState, useContext} from 'react';
+import {UserContext} from '@app/store/user';
 import {
     StyleSheet,
     Text,
@@ -11,20 +12,18 @@ import FastImage from "react-native-fast-image";
 import * as ImagePicker from 'expo-image-picker';
 import moment from 'moment';
 
-import Background from '../../components/background'
-import PageHeader from '../../components/header'
-import { ColorPalette } from '../../styles/colorPalette'
+import Background from '@app/frontend/components/background';
+import PageHeader from '@app/frontend/components/header'
+import { ColorPalette } from '@app/frontend/styles/colorPalette'
 import  DateTimePicker, { DateTimePickerEvent }  from "@react-native-community/datetimepicker"
-import { Friend, User } from '../../../shared/interfaces/user'
-import SexDialog from '../../components/sexDialog'
-import {state} from "../../../store";
-import Images from "../../../theme/images";
-import { TOAST_SHOW_TIME } from "../../../config";
-import {UploadController} from "../../../controller/upload";
-import { UserController } from "../../../controller/user";
-import RoundButton from "../../components/RoundButton";
-import LoadingOverlay from "../../components/LoadingOverlay";
-import {userState} from "../../../store/user";
+import { Friend, User } from '@app/shared/interfaces/user'
+import SexDialog from '@app/frontend/components/sexDialog'
+import Images from "@app/theme/images";
+import { TOAST_SHOW_TIME } from "@app/config";
+import {UploadController} from "@app/controller/upload";
+import { UserController } from "@app/controller/user";
+import RoundButton from "@app/frontend/components/RoundButton";
+import LoadingOverlay from "@app/frontend/components/LoadingOverlay";
 
 const ProfileScreen = () => {
 
@@ -32,19 +31,17 @@ const ProfileScreen = () => {
     const [timePicker, setTimePicker] = useState(false);
     const [sexDialogPicker, setSexDialogPicker] = useState<boolean>(false)
     const [interestDialogPicker, setInterestDialogPicker] = useState<boolean>(false)
-
-
-
-    const currentUser = state.user.currentUser;
-    console.log('current user =====>', currentUser, state.user);
-
+    const {profile: currentUser, setProfile } = useContext(UserContext) as {
+        profile: User,
+        setProfile: (profile: User) => void
+    }
     const [date, setDate] = useState<Date>(currentUser.dateAndTimeOfBirth ? new Date(currentUser.dateAndTimeOfBirth) : new Date());
     const [ name, setName ] = useState<string>(currentUser.name || '')
-    const [ sex, setSex ] = useState<User.SexType>(currentUser.sex || User.SexType.Other)
-    const [ interest, setInterest ] = useState<string>(currentUser.interestedType || '')
+    const [ sex, setSex ] = useState<User.SexType>(currentUser.sex || "other")
+    const [ interest, setInterest ] = useState<User.SexType | User.SexType[]>(currentUser.interestedType || "other")
     const [ birthPlace, setBirthPlace ] = useState<string>(currentUser.placeOfBirth || '')
-    const [ profilePicture, setProfilePicture ] = useState<string>(currentUser.profilePicture)
-    const [ avatar, setAvatar ] = useState(null);
+    const [ profilePicture, setProfilePicture ] = useState<string>(currentUser.profilePicture??"")
+    const [ avatar, setAvatar ] = useState<string|null>(null);
     const [ loading, setLoading ] = useState(false);
     const [ error, setError ] = useState(null);
 
@@ -111,8 +108,8 @@ const ProfileScreen = () => {
         });
         setLoading(true);
         if (!result.canceled) {
-            setProfilePicture(result.uri);
-            setAvatar(result);
+            setProfilePicture(result.uri??"");
+            setAvatar(result.uri??"");
             setLoading(false);
         } else {
             setLoading(false);
@@ -127,7 +124,7 @@ const ProfileScreen = () => {
             const uploadedUrl = await UploadController.uploadImage(avatar);
             userAvatar = uploadedUrl;
         }
-        const userId = currentUser.userId;
+        const userId = currentUser.id;
         const data = {
             dateAndTimeOfBirth: moment(date).toISOString(),
             interestedType: interest,
@@ -138,10 +135,8 @@ const ProfileScreen = () => {
         };
         const {user, status, error} = await UserController.updateUser(userId, data);
         if (status) {
-            state.user.currentUser = {
-                ...currentUser,
-                ...data,
-            };
+            setProfile(user);
+            setLoading(false);
         } else {
             setError(error);
         }
@@ -222,8 +217,8 @@ const ProfileScreen = () => {
                         </Text>
                         <TextInput
                             style = { styles.textField }
-                            value = { interest }
-                            onChangeText = { it => setInterest(it) }
+                            value = { interest as string }
+                            onChangeText = { it => setInterest(it as User.SexType) } 
                         />
                         <Text
                             style = { styles.font }

@@ -6,10 +6,10 @@ import {
 import React, {useState, useEffect} from "react";
 import * as Location from 'expo-location';
 
-import { ColorPalette } from '../../styles/colorPalette'
-import RoundButton from "../../components/RoundButton";
+import { ColorPalette } from '@app/frontend/styles/colorPalette'
+import RoundButton from "@app/frontend/components/RoundButton";
 
-const SelectScreen = (props) => {
+const SelectScreen = (props: any) => {
 
     return (
         <View style={styles.container}>
