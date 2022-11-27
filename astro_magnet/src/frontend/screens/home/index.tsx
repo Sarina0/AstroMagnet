@@ -1,23 +1,13 @@
-import {
-    StyleSheet,
-    Text, TouchableOpacity,
-    View,
-} from 'react-native'
 import {useEffect, useState, useContext} from "react";
-
-import Background from '@app/frontend/components/background'
-import PageHeader from '@app/frontend/components/header'
+import PageHeader from '@app/frontend/components/global/header'
 import SelectScreen from "./SelectScreen";
 import LikedScreen from "./LikedScreen";
 import LookingScreen from "./LookingScreen";
-
 import { HOME_PAGES } from "@app/config";
-import { ColorPalette } from "@app/frontend/styles/colorPalette";
-import RoundButton from "@app/frontend/components/RoundButton";
 import * as Location from "expo-location";
 import {UserContext} from "@app/store/user";
-import {UserController} from "@app/controller/user";
-
+import UserController from "@app/controller/user";
+import SafeArea from "@app/frontend/components/global/safeArea";
 
 const HomeScreen = () => {
     const [activePage, setActivePage] = useState(HOME_PAGES.HOME);
@@ -31,7 +21,7 @@ const HomeScreen = () => {
 
     const updateGeoLocation = async (location: any) => {
         if (currentUser) {
-            const userId = currentUser.id;
+            const userId = currentUser.id!;
             const data = {
                 lat: location.coords.latitude,
                 lng: location.coords?.longitude
@@ -57,8 +47,8 @@ const HomeScreen = () => {
 
 
     return (
-        <Background>
-            <PageHeader onPress={() => onRedirectPage(HOME_PAGES.HOME)}/>
+        <SafeArea>
+            <PageHeader onPress={onRedirectPage.bind(null, HOME_PAGES.HOME)}/>
             {activePage === HOME_PAGES.HOME ? (
                 <SelectScreen
                     onLikedPeople={() => onRedirectPage(HOME_PAGES.LIKED)}
@@ -71,15 +61,8 @@ const HomeScreen = () => {
             {activePage === HOME_PAGES.LOOKING ? (
                 <LookingScreen />
             ) : null}
-        </Background>
+        </SafeArea>
     )
 }
 
 export default HomeScreen;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        paddingHorizontal: 30
-    },
-})

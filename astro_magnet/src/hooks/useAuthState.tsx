@@ -12,7 +12,7 @@ export default function useAuthState() {
     const [status, setStatus] = useState<status>("loading");
 
     // Handle user state changes
-    function onAuthStateChanged(user: any) {
+    function onAuthStateChanged(user: FirebaseAuthTypes.User|null) {
       if (user) {
         setUser(user);
         setStatus("authenticated");

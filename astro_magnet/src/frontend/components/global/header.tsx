@@ -1,8 +1,21 @@
 import { StyleSheet, Text, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
-import { ColorPalette } from '../../styles/colorPalette'
+import { ColorPalette } from '@app/theme/colors';
 
-const PageHeader = (props) => {
+/**
+ * props type for PageHeader component
+ * @property {()=>void} onPress - callback function when logo is pressed
+ */
+interface Props {
+    onPress?: () => void;
+}
+
+/**
+ * screen header component for main screens
+ * @prop {()=>void} onPress - callback function when logo is pressed
+ * @returns 
+ */
+const PageHeader = (props: Props) => {
     return (
         <TouchableOpacity
             style = { styles.container }

@@ -33,11 +33,11 @@ export async function signInWithGoogle(onError: (message: string) => void) {
  * @returns {Promise<void>}
  */
 export async function signOut(): Promise<void> {
-    try {
-        await GoogleSignIn.revokeAccess();
-        await GoogleSignIn.signOut();
-        return auth().signOut();
-    } catch (error:any) {
-        console.error(error);
-    }
+    Promise.all([
+        auth().signOut(),
+        GoogleSignIn.signOut(),
+        GoogleSignIn.revokeAccess()
+    ]).catch((error) => {
+        console.log("[LOG] error sign out:", error)
+    })
 }

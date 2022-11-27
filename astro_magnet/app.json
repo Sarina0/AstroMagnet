@@ -44,7 +44,14 @@
     },
     "plugins": [
       "@react-native-firebase/app",
-      "@react-native-google-signin/google-signin"
+      "@react-native-google-signin/google-signin",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "the app will need access to your photos",
+          "cameraPermission": "the app will need access to your camera"
+        }
+      ]
     ],
     "extra": {
       "eas": {

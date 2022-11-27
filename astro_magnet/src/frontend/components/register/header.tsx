@@ -1,17 +1,20 @@
 import { StyleSheet, Text, View, Image } from 'react-native'
 import React from 'react'
+import Images from '@app/theme/images';
 
+/**
+ * header of register screen
+ * @returns {JSX.Element} registration header component
+ */
 const RegistrationHeader = () => {
     return (
         <View
-            style = { styles.container }
+        style = { styles.container }
         >
-            <Image
-                    source={require("../../../../../assets/logo.png")}
-                />
-                <Text style = { styles.title }>
-                    AstroMagnet
-                </Text>
+            <Image source={Images.logo} />
+            <Text style = { styles.title }>
+                AstroMagnet
+            </Text>
         </View>
     )
 }

@@ -1,16 +1,14 @@
 import {
-    StyleSheet,
-    Text, TouchableOpacity,
-    View,
-    Image, TextInput, FlatList,
-
+    StyleSheet, Text, 
+    View, Image, 
+    FlatList, TextInput
 } from 'react-native'
 import {useEffect, useState, useContext} from "react";
 import FastImage from "react-native-fast-image";
-import { ColorPalette } from '@app/frontend/styles/colorPalette'
+import { ColorPalette } from "@app/theme/colors";
 import Images from "@app/theme/images";
-import {UserContext} from "@app/store/user";
-import {UserController} from "@app/controller/user";
+import { UserContext } from "@app/store/user";
+import UserController from "@app/controller/user";
 import EmptyView from "@app/frontend/components/EmptyView";
 import { User } from '@app/shared/interfaces/user';
 
@@ -26,7 +24,7 @@ const LikedScreen = () => {
 
     const loadLikeUsers = async () => {
         setLoading(true);
-        const {users: _users} = await UserController.getAllUsers();
+        const {data: _users} = await UserController.getAllUsers();
         const likeUsers = [];
         for (const user of _users) {
             const userId = user._ref._documentPath._parts[1];
@@ -67,17 +65,18 @@ const LikedScreen = () => {
 
     return (
         <View style={styles.container}>
-            <View style={styles.searchWrapper}>
+            <View style={styles.searchWrapper} className="bg-secondary">
                 <Image style={styles.searchIcon} source={Images.icon_search} />
                 <TextInput
                     style={styles.searchText}
+                    className="text-onSecondary"
                     placeholder={'Search'}
                     placeholderTextColor={ColorPalette.SOFT_MAGENTA}
                     value={keyword}
                     onChangeText = {onSearchUser}
                 />
             </View>
-            <Text style={styles.bannerText}>Liked People</Text>
+            <Text style={styles.bannerText} className="text-onSecondary">Liked People</Text>
             {filteredUsers && filteredUsers.length > 0 ? (
                 <FlatList
                     style={styles.listView}
@@ -86,9 +85,11 @@ const LikedScreen = () => {
                     ListFooterComponent={() => <View style={{ height: 20 }} />}
                     renderItem={({ item }) => {
                         return (
-                            <View style={styles.userCell}>
+                            <View style={styles.userCell} className="bg-tertiary">
                                 <FastImage style={styles.avatar} source={item.profilePicture ? {uri: item.profilePicture} : Images.avatar_placeholder} />
-                                <Text style={styles.nameText}>{item.name || ''}</Text>
+                                <Text className="text-lg text-secondary font-bold ml-5">
+                                    {item.name || ''}
+                                </Text>
                             </View>
                         );
                     }}
@@ -116,7 +117,6 @@ const styles = StyleSheet.create({
         borderColor: 'white',
         paddingHorizontal: 15,
         paddingVertical: 5,
-        backgroundColor: ColorPalette.DARK_VIOLET_1
     },
     searchIcon: {
         width: 20,
@@ -124,14 +124,12 @@ const styles = StyleSheet.create({
     },
     searchText: {
         marginLeft: 15,
-        color: 'white',
         width: '100%',
         fontSize: 20
     },
     bannerText: {
-        fontWeight: '500',
+        fontWeight: "bold",
         fontSize: 22,
-        color: ColorPalette.SOFT_MAGENTA,
         marginBottom: 10
     },
     listView: {
@@ -140,7 +138,6 @@ const styles = StyleSheet.create({
     userCell: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: ColorPalette.DESATURATED_MAGENTA,
         padding: 10,
         borderRadius: 10,
         marginBottom: 10
@@ -156,5 +153,4 @@ const styles = StyleSheet.create({
         color: ColorPalette.VIOLET,
         fontWeight: '600'
     }
-
 })

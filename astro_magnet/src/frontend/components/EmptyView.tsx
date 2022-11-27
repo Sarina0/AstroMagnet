@@ -2,11 +2,19 @@ import React from 'react';
 import { StyleSheet, View, Dimensions, Image, Text } from 'react-native';
 import Images from "../../theme/images";
 
-
+/**
+ * empty view component props type
+ * @property {string} title - title of the empty view
+ */
 interface Props {
     title: string;
 }
 
+/**
+ * component to show when there is no data
+ * @prop {string} title - title of the empty view
+ * @returns {JSX.Element} empty view component
+ */
 const EmptyView = (props: Props) => {
     const { title } = props;
 

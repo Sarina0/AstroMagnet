@@ -1,7 +1,7 @@
-import { StyleSheet, Image, Button } from 'react-native';
-import Background from '../../components/background'
-import RegistrationHeader from '../../components/registration/header'
-import SignInButton from '@app/frontend/components/global/signInButton';
+import { StyleSheet } from 'react-native';
+import RegistrationHeader from '@app/frontend/components/register/header'
+import SignInButton from '@app/frontend/components/register/signInButton';
+import SafeArea from '@app/frontend/components/global/safeArea';
 
 const Register = () => {
 
@@ -18,10 +18,10 @@ const Register = () => {
     }
 
     return (
-        <Background>
+        <SafeArea>
             <RegistrationHeader />
             <SignInButton onError={onFailure} />
-        </Background>
+        </SafeArea>
     )
 }
 

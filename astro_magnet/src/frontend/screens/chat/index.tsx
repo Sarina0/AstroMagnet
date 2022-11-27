@@ -1,10 +1,17 @@
 import { Button, StyleSheet, Text } from 'react-native'
 import { Dispatch, SetStateAction } from 'react'
-import Background from '../../components/background';
-import { ColorPalette } from '../../styles/colorPalette';
-import PageHeader from '../../components/header';
+import { ColorPalette } from '@app/theme/colors';
+import PageHeader from '@app/frontend/components/global/header';
+import SafeArea from "@app/frontend/components/global/safeArea";
+import Dialog from '@app/frontend/components/chat/dialog';
+import ChatInput from "@app/frontend/components/chat/chatInput";
+import {useState} from "react";
 
-
+/**
+ * ChatScreen props type
+ * @property {boolean} menuVisible - menu visibility
+ * @property {Dispatch<SetStateAction<boolean>>} setMenuVisible - menu visibility toggler
+ */
 interface Props {
   /**
    * Change the state of the menu being displayed or not
@@ -20,14 +27,21 @@ interface Props {
 
 const ChatScreen = (props: Props) => {
   const { setMenuVisible, menuVisible } = props;
+  const [newMessage, setNewMessage] = useState<string>("");
 
-    return (
-        <Background>
-            <PageHeader />
-            <Text style={ styles.title }>Chat Screen</Text>
-            <Button title="Hide menu" onPress={() => {setMenuVisible(!menuVisible)} }/>
-        </Background>
-    )
+  return (
+    <SafeArea>
+        <PageHeader />
+        <Text style={ styles.title }>Chat Screen</Text>
+        <ChatInput
+            value={newMessage}
+            onChangeText={setNewMessage}
+            placeholder="Type a message"
+            onSend={() => {}}
+        />
+        <Button title="Hide menu" onPress={() => {setMenuVisible(!menuVisible)} }/>
+    </SafeArea>    
+ )
 }
 
 export default ChatScreen
@@ -40,5 +54,4 @@ const styles = StyleSheet.create({
         color: ColorPalette.SOFT_MAGENTA,
         textAlign: "center"
     },
-
 })

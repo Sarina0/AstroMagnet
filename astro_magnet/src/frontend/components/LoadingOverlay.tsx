@@ -1,17 +1,14 @@
 import React from 'react';
 import { StyleSheet, View, Dimensions } from 'react-native';
-import {
-    SkypeIndicator,
-} from 'react-native-indicators';
-
+import { SkypeIndicator } from 'react-native-indicators';
 const width = Dimensions.get('window').width;
 const height = Dimensions.get('window').height;
 
-interface Props {
-
-}
-
-const LoadingOverlay = (props: Props) => {
+/**
+ * loading component when initializing app
+ * @returns {JSX.Element} loading overlay component
+ */
+const LoadingOverlay = () => {
     return (
         <View style={styles.indicatorOverlay}>
             <View style={styles.indicatorBackground}></View>

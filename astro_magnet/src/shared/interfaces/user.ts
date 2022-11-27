@@ -1,12 +1,15 @@
+import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+
+
 /**
  * User profile type
  * @property {string?} id - User id
  * @property {string} email - user email
  * @property {string?} name - user name
- * @property {SexType?} sex - user's sex
+ * @property {SexType|null} sex - user's sex
  * @property {string?} profilePicture - user's profile picture
  * @property {Friend[]} friendList - user's friend list
- * @property {Date?} dateAndTimeOfBirth - user's date and time of birth
+ * @property {Date | null} dateAndTimeOfBirth - user's date and time of birth
  * @property {string?} placeOfBirth - user's place of birth
  * @property {SexType?} interestedType - user's interested sex type
  * @property {Friend[]} messagingFriendList - user's messaging friend list
@@ -15,17 +18,18 @@ export interface User {
     id?: string;
     email: string;
     name?: string;
-    sex?: User.SexType;
+    sex: User.SexType | null;
     profilePicture?: string;
     friendList: Friend[];
-    dateAndTimeOfBirth?: Date;
+    dateAndTimeOfBirth: Date | null;
     placeOfBirth?: string;
-    interestedType?: User.SexType | (User.SexType)[];
+    interestedType: (User.SexType)[];
     messagingFriendList: Friend[];
-    liked?: string[];
-    disliked?: string[];
+    liked: string[];
+    disliked: string[];
     lat?: number,
     lng?: number,
+    createdAt: FirebaseFirestoreTypes.Timestamp;
 }
 
 /**

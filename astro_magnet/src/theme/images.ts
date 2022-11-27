@@ -7,6 +7,8 @@ const Images = {
     icon_search: require('../../assets/icon_search.png'),
     icon_sad: require('../../assets/icon_sad.png'),
     google_icon: require('../../assets/google.png'),
+    logo: require('../../assets/logo.png'),
+    background: require('../../assets/background.png'),
 };
 
 export default Images;

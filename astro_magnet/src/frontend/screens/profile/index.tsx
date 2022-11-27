@@ -1,150 +1,101 @@
-import {useState, useContext} from 'react';
+import {useState, useContext, useRef} from 'react';
 import {UserContext} from '@app/store/user';
 import {
     StyleSheet,
-    Text,
-    View,
-    TextInput,
+    Text, View,
     TouchableOpacity,
-    Platform, ScrollView
+    ScrollView
 } from 'react-native'
-import FastImage from "react-native-fast-image";
-import * as ImagePicker from 'expo-image-picker';
-import moment from 'moment';
-
-import Background from '@app/frontend/components/background';
-import PageHeader from '@app/frontend/components/header'
-import { ColorPalette } from '@app/frontend/styles/colorPalette'
-import  DateTimePicker, { DateTimePickerEvent }  from "@react-native-community/datetimepicker"
-import { Friend, User } from '@app/shared/interfaces/user'
-import SexDialog from '@app/frontend/components/sexDialog'
-import Images from "@app/theme/images";
-import { TOAST_SHOW_TIME } from "@app/config";
+import PageHeader from '@app/frontend/components/global/header'
+import { ColorPalette } from '@app/theme/colors'
+import { User } from '@app/shared/interfaces/user'
 import {UploadController} from "@app/controller/upload";
-import { UserController } from "@app/controller/user";
-import RoundButton from "@app/frontend/components/RoundButton";
+import UserController from "@app/controller/user";
+import { signOut } from '@app/controller/auth';
+import RoundButton from "@app/frontend/components/global/RoundButton";
 import LoadingOverlay from "@app/frontend/components/LoadingOverlay";
+import SafeArea from '@app/frontend/components/global/safeArea';
+import Input from "@app/frontend/components/global/input";
+import Select from "@app/frontend/components/global/select";
+import MultiSelect from '@app/frontend/components/global/multiSelect';
+import ImagePicker from '@app/frontend/components/global/imagePicker';
+import DatePicker from '@app/frontend/components/global/datepicker';
 
 const ProfileScreen = () => {
-
-    const [datePicker, setDatePicker] = useState(false);
-    const [timePicker, setTimePicker] = useState(false);
-    const [sexDialogPicker, setSexDialogPicker] = useState<boolean>(false)
-    const [interestDialogPicker, setInterestDialogPicker] = useState<boolean>(false)
     const {profile: currentUser, setProfile } = useContext(UserContext) as {
         profile: User,
         setProfile: (profile: User) => void
     }
-    const [date, setDate] = useState<Date>(currentUser.dateAndTimeOfBirth ? new Date(currentUser.dateAndTimeOfBirth) : new Date());
+    const [date, setDate] = useState<Date|null>(
+        currentUser.dateAndTimeOfBirth ? new Date(currentUser.dateAndTimeOfBirth) : null
+    );
     const [ name, setName ] = useState<string>(currentUser.name || '')
-    const [ sex, setSex ] = useState<User.SexType>(currentUser.sex || "other")
-    const [ interest, setInterest ] = useState<User.SexType | User.SexType[]>(currentUser.interestedType || "other")
+    const [ sex, setSex ] = useState<User.SexType|null>(currentUser.sex)
+    const [ interest, setInterest ] = useState<User.SexType[]>(currentUser.interestedType)
     const [ birthPlace, setBirthPlace ] = useState<string>(currentUser.placeOfBirth || '')
-    const [ profilePicture, setProfilePicture ] = useState<string>(currentUser.profilePicture??"")
-    const [ avatar, setAvatar ] = useState<string|null>(null);
+    const [ updatedPic, setUpdatedPic] = useState<string | null | undefined>(null);
     const [ loading, setLoading ] = useState(false);
-    const [ error, setError ] = useState(null);
+    const [ error, setError ] = useState<string|null>(null);
 
-    function onDateSelected(e: DateTimePickerEvent, value: Date | undefined): void {
-        if(value != undefined) {
-            setDate(value);
+    //list of items for select components
+    const selectItems = User.sexes.map(sex=>({
+        label: sex,
+        value: sex
+    }))
+
+    /**
+     * upload image to firebase storage
+     */
+    const onUploadImage = async () => {
+        setLoading(true);
+        if (!updatedPic) {
+            return;
         }
-        setTimePicker(false);
-        setDatePicker(false);
-    };
-
-
-    const getDateString = (): string => {
-        let month = ""
-        switch (date.getMonth()) {
-            case 0:
-                month = "Jan";
-                break;
-            case 1:
-                month = "Feb";
-                break;
-            case 2:
-                month = "Mar";
-                break;
-            case 3:
-                month = "Apr";
-                break;
-            case 4:
-                month = "May";
-                break;
-            case 5:
-                month = "Jun";
-                break;
-            case 6:
-                month = "Jul";
-                break;
-            case 7:
-                month = "Aug";
-                break;
-            case 8:
-                month = "Sep";
-                break;
-            case 9:
-                month = "Oct";
-                break;
-            case 10:
-                month = "Nov";
-                break;
-            case 11:
-                month = "Dec"
-                break;
-        }
-
-        return `${date.getDate()} ${month} ${date.getFullYear()}`
+        const url = await UploadController.uploadImage({
+            uri: updatedPic}
+        ).catch((error)=>{
+            setError(error.message);
+            setLoading(false);
+        });
+        return url;
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////// Image Picker. //////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
-    const pickImageAsync = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
-            quality: 1,
-        });
-        setLoading(true);
-        if (!result.canceled) {
-            setProfilePicture(result.uri??"");
-            setAvatar(result.uri??"");
-            setLoading(false);
-        } else {
-            setLoading(false);
-            alert('You did not select any image.');
-        }
-    };
-
+    /**
+     * update user profile in firestore
+     */
     const onSaveProfile = async () => {
-        setLoading(true);
-        let userAvatar = profilePicture;
-        if (avatar) {
-            const uploadedUrl = await UploadController.uploadImage(avatar);
-            userAvatar = uploadedUrl;
-        }
-        const userId = currentUser.id;
+        const updatedURL = await onUploadImage();
+        const userProfilePic = typeof updatedURL === 'string' ? 
+                updatedURL : currentUser.profilePicture;
         const data = {
-            dateAndTimeOfBirth: moment(date).toISOString(),
+            dateAndTimeOfBirth: date,
             interestedType: interest,
             name,
             placeOfBirth: birthPlace,
-            profilePicture: userAvatar,
+            profilePicture: userProfilePic,
             sex
         };
-        const {user, status, error} = await UserController.updateUser(userId, data);
+        const {
+            data: result, 
+            status
+        } = await UserController.updateUser(
+            currentUser.id!, 
+            data
+        );
         if (status) {
-            setProfile(user);
+            setProfile({
+                ...currentUser,
+                ...data
+            });
             setLoading(false);
         } else {
-            setError(error);
+            setError(result);
         }
         setLoading(false);
     }
 
     return (
-        <Background>
+        <SafeArea>
             <ScrollView style={{flex: 1}}>
                 <View
                     style = { styles.container }
@@ -155,118 +106,71 @@ const ProfileScreen = () => {
                     <View
                         style = { styles.form }
                     >
-
-                        <Text
-                            style = { styles.font }
-                        >
-                            Name
-                        </Text>
-                        <TextInput
-                            style = { styles.textField }
+                        <ImagePicker
+                            fallback={currentUser.profilePicture}
+                            value={updatedPic}
+                            onChange={(value)=>setUpdatedPic(value)} 
+                            labelStyle={{marginTop: 20}}
+                            style={{marginVertical: 10}}
+                            mode="avatar"
+                        />
+                        <Input
+                            label = "Name"
                             value = { name }
-                            onChangeText = { it => setName(it) }
+                            onChangeText = { (text) => setName(text) }
+                            placeholder = "Enter your name"
+                            style={{marginTop: 20}}
                         />
-                        <Text
-                            style = { styles.font }
-                        >
-                            Sex
-                        </Text>
-                        <Text
-                            style = { styles.textField }
-                            onPress = { () => { setSexDialogPicker(true) } }
-                        >
-                            { sex }
-                        </Text>
-                        <Text
-                            style = { styles.font }
-                        >
-                            Date and time of Birth
-                        </Text>
-                        <Text
-                            style = { styles.textField }
-                        >
-                            <Text
-                                onPress={() => {setDatePicker(true)}}
-                            >
-                                {getDateString()}
-                            </Text>
-                            <Text>
-                                {"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"}
-                            </Text>
-                            <Text
-                                onPress={() => {setTimePicker(true)}}
-                            >
-                                {date.getHours()}:{date.getMinutes().toString().length == 1 ? "0" + date.getMinutes() : date.getMinutes()}
-                            </Text>
-
-                        </Text>
-                        <Text
-                            style = { styles.font }
-                        >
-                            Place of Birth
-                        </Text>
-                        <TextInput
-                            style = { styles.textField }
+                        <Select
+                            label = "Sex"
+                            value= {sex}
+                            onValueChange = { 
+                                (value) => setSex(value as User.SexType) 
+                            }
+                            items={selectItems}
+                            style={{marginTop: 20, width: "50%"}}
+                            placeholder="Select your sex"
+                        />
+                        <Input
+                            label = "Birth Place"
                             value = { birthPlace }
-                            onChangeText = { it => setBirthPlace(it) }
+                            onChangeText = { (text) => setBirthPlace(text) }
+                            placeholder = "Enter your birth place"
+                            style={{marginTop: 20}}
                         />
-                        <Text
-                            style = { styles.font }
-                        >
-                            Interest in
-                        </Text>
-                        <TextInput
-                            style = { styles.textField }
-                            value = { interest as string }
-                            onChangeText = { it => setInterest(it as User.SexType) } 
+                        <MultiSelect
+                            label = "Interested In"
+                            value = { interest }
+                            onValueChange = { 
+                                (selected) => setInterest(selected as User.SexType[]) 
+                            }
+                            items={selectItems}
+                            placeholder = "Who are you interested in?"
+                            style={{marginTop: 20}}
                         />
-                        <Text
-                            style = { styles.font }
-                        >
-                            Upload a picture
-                        </Text>
-                        <TouchableOpacity onPress={pickImageAsync}>
-                            <FastImage
-                                style={styles.profilePicture}
-                                source={profilePicture ? {uri: profilePicture} : Images.avatar_placeholder}
-                            />
-                        </TouchableOpacity>
+                        <DatePicker
+                            label = "Date of Birth"
+                            value = { date }
+                            onChange = { (value)=> setDate(value) }
+                            style={{marginTop: 20}}
+                        />
+                        <RoundButton
+                            style={styles.saveButton}
+                            title="update"
+                            onPress={onSaveProfile}
+                        />
+                        <RoundButton
+                            style={[styles.saveButton, {
+                                marginTop: 30,
+                            }]}
+                            title="sign out"
+                            onPress={signOut}
+                        />
                     </View>
-                    <RoundButton
-                        style={styles.saveButton}
-                        title={'Save'}
-                        onPress={onSaveProfile}
-                    />
-
-                    {
-                        sexDialogPicker ?
-                            <SexDialog
-                                setValue={ setSex }
-                                setDialogPicker={ setSexDialogPicker } /> : null
-                    }
-
-                    {datePicker && (
-                        <DateTimePicker
-                            value={date}
-                            mode={'date'}
-                            is24Hour={true}
-                            onChange={onDateSelected}
-                        />
-                    )}
-
-                    {timePicker && (
-                        <DateTimePicker
-                            value={date}
-                            mode={'time'}
-                            is24Hour={false}
-                            onChange={onDateSelected}
-                        />
-                    )}
-
                 </View>
             </ScrollView>
             {loading && <LoadingOverlay />}
-        </Background>
+        </SafeArea>
     )
 }
 
@@ -283,36 +187,10 @@ const styles = StyleSheet.create({
     },
     form: {
         padding: 10,
-        paddingLeft: 30
-    },
-    font: {
-        color: ColorPalette.SOFT_MAGENTA,
-        fontSize: 20,
-        fontWeight: "bold",
-        marginBottom: 10,
-    },
-    textField: {
-        backgroundColor: ColorPalette.DARK_VIOLET_1,
-        color: ColorPalette.SOFT_MAGENTA,
-        padding: 5,
-        paddingLeft: 10,
-        borderRadius: 10,
-        fontSize: 20,
-        marginRight: 30,
-        marginBottom: 15,
-    },
-    textFlex: {
-        flex: 1,
-        flexDirection: "row",
-        minHeight: 40,
-    },
-    profilePicture: {
-        width: 80,
-        height: 80,
-        borderRadius: 40
+        paddingLeft: 30,
+        flexDirection: "column",
     },
     saveButton: {
-        marginHorizontal: 20,
-        marginVertical: 10
+        marginTop: 20,
     }
 })
