@@ -6,7 +6,7 @@ yarn
 ``` 
 ⚠ you can use npm too but it will likely give an error about legacy, if it works for you, you are free to use it
 intall yarn by: npm i -g yarn
-## Step to setup and run the project on Android emulator
+## Step to run the project on Android emulator
 1. Open android folder and create a folder name "local.properties"
 2. Inside local.properties, add this: sdk.dir=/*PATH TO YOUR ANDROID SKD*/
 ⚠ path to your sdk can be found in android studio system setting -> sdk 
