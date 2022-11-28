@@ -66,18 +66,18 @@ const HomeScreen = () => {
     return (
         <SafeArea>
             <PageHeader onPress={onRedirectPage.bind(null, HOME_PAGES.HOME)}/>
-            {activePage === HOME_PAGES.HOME ? (
+            {activePage === HOME_PAGES.HOME && (
                 <SelectScreen
                     onLikedPeople={() => onRedirectPage(HOME_PAGES.LIKED)}
                     onStartLooking={() => onRedirectPage(HOME_PAGES.LOOKING)}
                 />
-            ) : null}
-            {activePage === HOME_PAGES.LIKED ? (
+            )}
+            {activePage === HOME_PAGES.LIKED && (
                 <LikedScreen />
-            ) : null}
-            {activePage === HOME_PAGES.LOOKING ? (
+            )}
+            {activePage === HOME_PAGES.LOOKING && (
                 <LookingScreen />
-            ) : null}
+            )}
         </SafeArea>
     )
 }
