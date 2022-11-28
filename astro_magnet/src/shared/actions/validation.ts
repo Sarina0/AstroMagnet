@@ -4,6 +4,7 @@ const sexes = ["male", "female", "other"];
 
 export const validateUser = (
     user: Partial<User>, 
+    validateEmail?: boolean,
     onError?: (message: string)=> void
 ) => {
 
@@ -14,7 +15,7 @@ export const validateUser = (
     }
 
     //guard against invalid email
-    if (!isEmailValid(user.email!)) {
+    if ( validateEmail && !isEmailValid(user.email!)) {
         onError && onError("invalid email");
         return false;
     }
@@ -51,7 +52,6 @@ export const validateUser = (
  */
 export const isEmptyFieldExist = (user: Partial<User>) => {
     return (!user.name||
-        !user.email||
         !user.dateAndTimeOfBirth||
         !user.placeOfBirth||
         !user.sex||
