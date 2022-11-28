@@ -14,8 +14,6 @@ import ToastDialog from "@app/frontend/components/global/toast";
 const HomeScreen = () => {
     const toast = useToast();
     const [activePage, setActivePage] = useState(HOME_PAGES.HOME);
-    const [location, setLocation] = useState(null);
-    const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const {profile: currentUser} = useContext(UserContext);
 
     const onRedirectPage = (page: any) => {
@@ -42,20 +40,25 @@ const HomeScreen = () => {
             try {
                 let { status } = await Location.requestForegroundPermissionsAsync();
                 if (status !== 'granted') {
-                    setErrorMsg('Permission to access location was denied');
-                    return;
+                    throw new Error('Permission denied');
                 }
 
                 let location = await Location.getCurrentPositionAsync({});
-                console.log('location =====>', location);
                 updateGeoLocation(location);
-            } catch (error) {
+            } catch (error: any) {
                 console.log("[LOG] get location error", error);
+                if (error.message === 'Permission denied') {
+                    toast.show({
+                        render: () => <ToastDialog 
+                            message="Please allow location acess so we can find you a match. Your data is safe with us!"
+                        />
+                    }) 
+                    return;
+                }
                 toast.show({
-                    render: () => <ToastDialog message="Error gettting location" />
+                    render: () => <ToastDialog message="Error gettting current location"/>
                 });
             }
-            
         })();
     }, []);
 
