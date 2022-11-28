@@ -21,7 +21,7 @@ you will have to create 1.
 ```bat
  npx expo prebuild
 ```
-⚠ do not do "npx expo prebuild --clean" since this will clear config of ios pod 
+⚠ do not do "npx expo prebuild --clean" since this will clear config of ios pod <br/>
 ⚠ if you already did prebuild --clean, paste these line again to ios pod file
 ```txt
   use_frameworks! :linkage => :static
