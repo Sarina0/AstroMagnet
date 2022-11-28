@@ -1,13 +1,11 @@
 import { User } from '@app/shared/interfaces/user';
 import firestore, { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
-import Messages from "../../theme/messages";
+import { FireDoc } from "@app/shared/interfaces/firebase";
 
 type NWResult<T> = {
     status: boolean,
     data: T
 }
-
-type firebasedoc = FirebaseFirestoreTypes.DocumentData;
 
 /**
  * User controller
@@ -16,6 +14,31 @@ export default class UserController {
 
     constructor() {
         throw new Error("UserController is a static class");
+    }
+
+    /**
+     * create a new user profile in firestore
+     * @param {User} data - new profile data
+     * @param {((message:)=>void)|undefinded }onError - error callback(handle network error)
+     * @returns {Promise<NWResult<string>>} - returns status of operation and message
+     */
+    static async createUser(
+        data: User,
+        onError?: (message: string) => void
+    ): Promise<NWResult<string>> {
+        await firestore()
+            .collection('users')
+            .add({
+                ...data,
+            }).catch((error) => {
+                console.log("[LOG] error create user:", error)
+                onError && onError(error.message)
+            })
+
+        return {
+            status: true,
+            data: "User created"
+        }
     }
 
     /**
@@ -49,12 +72,12 @@ export default class UserController {
      * get all users
      * @param {string} currentUserId - current logged in user id
      * @param {(message: string)=>void} onError - error callback(handle network error)
-     * @returns returns firebasedoc of users
+     * @returns returns FireDoc of users
      */
     static async getAllUsers(
         onError?: (message: string) => void
-    ): Promise<NWResult<firebasedoc[]>> {
-        let result: firebasedoc[] = []
+    ): Promise<NWResult<FireDoc[]>> {
+        let result: FireDoc[] = []
         await firestore()
             .collection('users')
             .get()

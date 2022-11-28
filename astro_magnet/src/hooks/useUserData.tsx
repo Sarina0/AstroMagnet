@@ -2,8 +2,20 @@ import {useState, useEffect} from "react";
 import firestore from "@react-native-firebase/firestore";
 import useAuthState from "./useAuthState";
 import { User } from "@app/shared/interfaces/user";
+import { FirebaseAuthTypes } from "@react-native-firebase/auth";
 
-export default function useUserData() {
+/**
+ * hooks to setup user profile after user has logged in
+ * @param {(error: string)=>void | undefined} onError - callback function to handle network error
+ * @return {FirebaseAuthTypes.User} user - current logged in user
+ * @return status - of authentication: loading-unauthenticated-authenticated
+ * @return setupProfile - react setState function to update user profile
+ * @return {User|null} userProfile - user profile
+ * @return {boolean} profileLoading - loading status of user profile(true-false)
+ */
+export default function useUserData(
+    onError?: (error: string) => void,
+) {
     const {user, status} = useAuthState();
     const [userProfile, setUserProfile] = useState<User|null>(null);
     const [profileLoading, setProfileLoading] = useState<boolean>(false);
@@ -30,43 +42,13 @@ export default function useUserData() {
                         } as User);
                         setProfileLoading(false);
                     } else {
-
-                        //if profile does not exist
-                        //create an user profile placeholder
-                        const data: User = {
-                            email: user.email!,
-                            name: user.displayName?? "Anonymous",
-                            sex: null,
-                            profilePicture: user.photoURL?? "",
-                            friendList: [],
-                            dateAndTimeOfBirth: null,
-                            placeOfBirth: "",
-                            interestedType: [],
-                            messagingFriendList: [],
-                            liked: [],
-                            disliked: [],
-                            lat: 0,
-                            lng: 0,
-                            createdAt: firestore.Timestamp.now(),
-                        }
-
-                        //create new profile using the placeholder and add it to the database
-                        firestore()
-                            .collection('users')
-                            .add(data)
-                            .then(() => {
-
-                                //set the profile after it is created
-                                setUserProfile({
-                                    ...data,
-                                    id: documentSnapShot.docs[0].id, 
-                                });
-                            }).catch((error) => {
-                                console.log(error);
-                            }).finally(() => {
-                                setProfileLoading(false);
-                            })
+                        //if profile does not exist, set the profile to null
+                        setUserProfile(null);
+                        setProfileLoading(false);
                     }
+                }, (error)=> {
+                    onError && onError("Error fetching user profile");
+                    console.log("[LOG] error fetching user profile:", error);
                 })
 
             //unsubscribe on view unmount

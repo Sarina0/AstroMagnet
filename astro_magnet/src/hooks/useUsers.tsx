@@ -1,52 +1,47 @@
-import {useEffect, useState} from "react";
-import firestore, { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
-
-type doc = FirebaseFirestoreTypes.DocumentData;
-
+import {useEffect, useState, useContext} from "react";
+import firestore from "@react-native-firebase/firestore";
+import { FireDoc } from "@app/shared/interfaces/firebase";
+import { UserContext } from "@app/store/user";
 /**
  * use users hooks, fetch all user from firestore
- * @param {(doc: FirebaseFirestoreTypes.DocumentData)=>boolean} filterUser - a function to filter user if needed
+ * users will not include current logged in user
+ * users will not include users that current logged-in user already liked or disliked
+ * @param {(error: string)=>void | undefined} onError - callback function to handle network error
  * @returns {users: FirebaseFirestoreTypes.DocumentData[], loading: boolean} - a list of users and loading state
  */
 export default function useUsers(
-    onFilter?: (doc: doc) => boolean
+    onError?: (error: string) => void,
 ) {
-    const [users, setUsers] = useState<doc[]>([]);
+    const [users, setUsers] = useState<FireDoc[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const { profile } = useContext(UserContext);
     useEffect(() => {
+        if (!profile) return;
         const unsubscribe = firestore()
             .collection("users")
+            .where(firestore.FieldPath.documentId(), "!=", profile.id)
             .onSnapshot((querySnapshot) => {
-                const docs: doc[] = [];
-                querySnapshot.forEach((documentSnapshot) => {
-                    if (onFilter) {
-                        if (onFilter(documentSnapshot)) {
-                            docs.push({
-                                ...documentSnapshot.data(),
-                                id: documentSnapshot.id,
-                            });
-                        }
-                    } else {
-                        docs.push({
-                            ...documentSnapshot.data(),
-                            id: documentSnapshot.id,
+                const list: FireDoc[] = [];
+                querySnapshot.forEach((doc) => {
+                    if (!profile?.liked.includes(doc.id) && !profile?.disliked.includes(doc.id)) {
+                        list.push({
+                            id: doc.id,
+                            ...doc.data(),
                         });
                     }
                 });
-    
-                //sort by createdAt
-                docs.sort((a, b) => {
-                    if (b.createdAt && a.createdAt) {
-                        return a.createdAt.toMillis() - b.createdAt.toMillis();
-                    } else {
-                        return 0;
-                    }
-                })
-                setUsers(docs);
+                setUsers(list);
                 setLoading(false);
+            }, (error) => {
+                onError && onError("Error fetching users");
+                console.log("[LOG] error fetching users:", error);
             });
         return unsubscribe;
-    }, []);
+    }, [
+        profile?.id,
+        profile?.liked,
+        profile?.disliked,
+    ]);
     return {
         users,
         loading

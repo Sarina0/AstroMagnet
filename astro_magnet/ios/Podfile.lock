@@ -1225,6 +1225,9 @@ PODS:
   - RNGoogleSignin (8.2.1):
     - GoogleSignIn (~> 6.2)
     - React-Core
+  - RNScreens (3.18.2):
+    - React-Core
+    - React-RCTImage
   - RNSVG (13.4.0):
     - React-Core
   - RNVectorIcons (9.2.0):
@@ -1308,6 +1311,7 @@ DEPENDENCIES:
   - "RNFBFirestore (from `../node_modules/@react-native-firebase/firestore`)"
   - "RNFBStorage (from `../node_modules/@react-native-firebase/storage`)"
   - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
+  - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -1474,6 +1478,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/storage"
   RNGoogleSignin:
     :path: "../node_modules/@react-native-google-signin/google-signin"
+  RNScreens:
+    :path: "../node_modules/react-native-screens"
   RNSVG:
     :path: "../node_modules/react-native-svg"
   RNVectorIcons:
@@ -1573,6 +1579,7 @@ SPEC CHECKSUMS:
   RNFBFirestore: 28b9fbe1cef44e8cba8299cd5ce7bfd68a3a928e
   RNFBStorage: 86369cbbe3a9e80b12c2e6f06b75cac45c94f2a4
   RNGoogleSignin: 3db2d849581299f425f5b61b90cb482a9e68c7af
+  RNScreens: 34cc502acf1b916c582c60003dc3089fa01dc66d
   RNSVG: 07dbd870b0dcdecc99b3a202fa37c8ca163caec2
   RNVectorIcons: fcc2f6cb32f5735b586e66d14103a74ce6ad61f8
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d

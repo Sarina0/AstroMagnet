@@ -41,7 +41,7 @@ const HomeScreen = () => {
 
             let location = await Location.getCurrentPositionAsync({});
             console.log('location =====>', location);
-            // updateGeoLocation(location);
+            updateGeoLocation(location);
         })();
     }, []);
 

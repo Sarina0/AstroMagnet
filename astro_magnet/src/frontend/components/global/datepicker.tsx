@@ -55,6 +55,14 @@ const PlaceholderText = (props: {
     )
 }
 
+/**
+ * Date and time picker component
+ * @prop {string | undefined} label - label of the date/time picker
+ * @prop {Date | null | undefined} value - value of the date/time picker
+ * @prop {(value: Date) => void} onChange - function to call when the value changes
+ * @prop {ViewStyle | undefined} style - extra style for the date/time picker container
+ * @returns {ReactNode} - date/time picker component
+ */
 export default function DatePickerComponent(props: Props) {
 
     //open and close state of pickers

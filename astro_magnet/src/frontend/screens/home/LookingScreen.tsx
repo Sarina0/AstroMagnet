@@ -1,9 +1,7 @@
 import {
-    StyleSheet,
+    StyleSheet, View,
     Text, TouchableOpacity,
-    View,
-    Image,
-    Dimensions
+    Image, Dimensions
 } from 'react-native'
 import {useEffect, useState, useContext} from "react";
 import FastImage from "react-native-fast-image";
@@ -13,70 +11,112 @@ import Images from "@app/theme/images";
 import {UserContext} from "@app/store/user";
 import LoadingOverlay from "@app/frontend/components/LoadingOverlay";
 import EmptyView from "@app/frontend/components/EmptyView";
-import { User } from '@app/shared/interfaces/user';
 import useUsers from '@app/hooks/useUsers';
-import { FirebaseFirestoreTypes } from '@react-native-firebase/firestore';
+import { FireDoc as doc } from '@app/shared/interfaces/firebase';
+import { getAge } from '@app/shared/actions/time';
+import { useToast } from 'native-base';
+import ToastDialog from '@app/frontend/components/global/toast';
 
 const width = Dimensions.get('window').width;
-type doc = FirebaseFirestoreTypes.DocumentData;
 
 const LookingScreen = () => {
-    const {profile: currentUser, setProfile} = useContext(UserContext) as {
-        profile: User,
-        setProfile: (profile: User) => void
-    }
-    const filterUser = (user: doc) => {
-        const userId = user._ref._documentPath._parts[1];
-        if (userId !== currentUser.id) {
-            const like = currentUser.liked;
-            const dislike = currentUser.disliked;
-            const isLiked = like.includes(userId);
-            const isDisliked = dislike.includes(userId);
-            return !isLiked && !isDisliked;
-        }
-        return false;
-    }
-
-    const {users, loading} = useUsers(filterUser);
-    const [activeUser, setActiveUser] = useState<doc|null>(null);
+    const toast = useToast();
+    const { profile } = useContext(UserContext);
+    const {users, loading} = useUsers((error)=> {
+        toast.show({
+            render: () => <ToastDialog message={error} />
+        });
+    });
+    const [activeUser, setActiveUser] = useState<doc|null|undefined>(null);
     const [activeUserIndex, setActiveUserIndex] = useState(
        users.length> 0? users.indexOf(activeUser!): 0
     );
 
+    //load first user when users finished fetching
+    useEffect(()=> {
+        if (users.length > 0 && loading) {
+            setActiveUser(users[0]);
+        }
+    }, [users, loading])
+
+    /**
+     * on like button pressed
+     */
     const onLike = async () => {
-        await UserController.likeUser(currentUser.id!, activeUser!.userId);
-    }
-
-    const onDislike = async () => {
-        await UserController.dislikeUser(currentUser.id!, activeUser!.userId);
-    }
-
-    const onNextUser = () => {
-        if (users.indexOf(activeUser!) + 1 > users.length - 1) {
+        if (users.indexOf(activeUser!) === users.length - 1) {
             setActiveUser(users[0]);
             setActiveUserIndex(0);
         } else {
             setActiveUser(users[users.indexOf(activeUser!) + 1]);
             setActiveUserIndex(users.indexOf(activeUser!) + 1);
         }
+        await UserController.likeUser(
+            profile?.id!, 
+            activeUser!.id, 
+            (error)=> {
+                toast.show({
+                    render: () => <ToastDialog message={error} />
+                })
+            }
+        );
     }
 
+    /**
+     * on dislike button pressed
+     */
+    const onDislike = async () => {
+        if (users.indexOf(activeUser!) === users.length - 1) {
+            setActiveUser(users[0]);
+            setActiveUserIndex(0);
+        } else {
+            setActiveUser(users[users.indexOf(activeUser!) + 1]);
+            setActiveUserIndex(users.indexOf(activeUser!) + 1);
+        }
+        await UserController.dislikeUser(
+            profile?.id!, 
+            activeUser!.id,
+            (error)=> {
+                toast.show({
+                    render: () => <ToastDialog message={error} />
+                })
+            }
+        );
+    }
+
+    /**
+     * on next button pressed
+     */
+    const onNextUser = () => {
+        if (activeUserIndex < users.length - 1) {
+            setActiveUserIndex(activeUserIndex + 1);
+            setActiveUser(users[activeUserIndex + 1]);
+        } else {
+            setActiveUserIndex(0);
+            setActiveUser(users[0]);
+        }
+    }
+
+    /**
+     * on previous button pressed
+     */
     const onPrevUser = () => {
-        if (users.indexOf(activeUser!) -1 < 0) {
-            return;
-         }
-        setActiveUser(users[activeUserIndex - 1]);
-        setActiveUserIndex(users.indexOf(activeUser!) - 1);
+        if (activeUserIndex > 0) {
+            setActiveUserIndex(activeUserIndex - 1);
+            setActiveUser(users[activeUserIndex - 1]);
+        } else {
+            setActiveUser(users[users.length - 1]);
+            setActiveUserIndex(users.length - 1);
+        }
     }
 
     const toRad = (Value:any) => {
         return (Value * Math.PI) / 180;
     };
 
-    const getCompatibility = (user:any) => {
-        if (currentUser && user) {
-            let lat1 = currentUser.lat;
-            let lng1 = currentUser.lng;
+    const getCompatibility = (user:doc) => {
+        if (profile && user) {
+            let lat1 = profile.lat;
+            let lng1 = profile.lng;
             let lat2 = user.lat;
             let lng2 = user.lng;
 
@@ -96,41 +136,25 @@ const LookingScreen = () => {
         return 0;
     }
 
-    const getAge = () => {
-        const birthYear = new Date(activeUser!.dateAndTimeOfBirth!.toDate()).getFullYear();
-        const curYear= new Date().getFullYear();
-        return curYear - birthYear;
-    }
-
-    useEffect(()=> {
-        if (users.length > 0 && loading) {
-            setActiveUser(users[0]);
-        }
-    }, [users, loading])
-
     return (
         <View style={styles.container}>
             {activeUser ? (
                 <View style={styles.userContainer}>
                     <View style={styles.selectorWrapper}>
-                        {activeUserIndex > 0 ? (
                         <TouchableOpacity onPress={onPrevUser}>
                             <Image style={styles.arrowImage} source={Images.icon_arrow_left}/>
                         </TouchableOpacity>
-                        ) : <Image style={styles.arrowImage} source={Images.icon_arrow_right} />}
                         <Text style={styles.nameText}>{activeUser.name || ''}</Text>
-                        {activeUserIndex < users.length - 1 || activeUserIndex == 0 ? (
-                            <TouchableOpacity onPress={onNextUser}>
-                                <Image style={styles.arrowImage} source={Images.icon_arrow_right}/>
-                            </TouchableOpacity>
-                        ) : <Image style={styles.arrowImage}  source={Images.icon_arrow_left}/>}
+                        <TouchableOpacity onPress={onNextUser}>
+                            <Image style={styles.arrowImage} source={Images.icon_arrow_right}/>
+                        </TouchableOpacity>
                     </View>
                     <View style={styles.compatibilityWrapper}>
                         <Text style={styles.compatibilityText}>Compatibility: {getCompatibility(activeUser)}%</Text>
                     </View>
                     <View style={styles.userInfo}>
                         <FastImage style={styles.avatar} source={activeUser.profilePicture ? {uri: activeUser.profilePicture} : Images.avatar_placeholder} />
-                        <Text style={styles.ageText}>Age: {getAge()}</Text>
+                        <Text style={styles.ageText}>Age: {getAge(activeUser.dateAndTimeOfBirth.toDate())}</Text>
                     </View>
                     <View style={styles.actionWrapper}>
                         <TouchableOpacity onPress={onLike}>

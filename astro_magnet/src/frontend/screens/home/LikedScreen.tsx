@@ -11,6 +11,7 @@ import { UserContext } from "@app/store/user";
 import UserController from "@app/controller/user";
 import EmptyView from "@app/frontend/components/EmptyView";
 import { User } from '@app/shared/interfaces/user';
+import LoadingOverlay from '@app/frontend/components/LoadingOverlay';
 
 const LikedScreen = () => {
     const [users, setUsers] = useState<any>([]);
@@ -39,7 +40,6 @@ const LikedScreen = () => {
                     });
                 }
             }
-
         }
         setUsers(likeUsers);
         setFilteredUsers(likeUsers);
@@ -97,6 +97,7 @@ const LikedScreen = () => {
             ) : (
                 <EmptyView title={'No liked people.'} />
             )}
+            {loading && <LoadingOverlay/>}
         </View>
     )
 }

@@ -38,11 +38,9 @@ export default PageHeader
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         flexDirection: "row",
-        maxHeight: 70,
         alignItems: "center",
-        paddingLeft: 30,
+        paddingLeft: 20,
     },
     logo: {
         paddingLeft: 30,

@@ -18,7 +18,7 @@ interface Props {
     onValueChange: (newValue: string) => void;
     items: {label: string, value: string}[];
     className?: string;
-    style?: ViewStyle;
+    style?: ViewStyle | ViewStyle[];
 }
 
 /**

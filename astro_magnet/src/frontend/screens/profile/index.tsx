@@ -1,15 +1,9 @@
-import {useState, useContext, useRef} from 'react';
+import { useState, useContext } from 'react';
 import {UserContext} from '@app/store/user';
-import {
-    StyleSheet,
-    Text, View,
-    TouchableOpacity,
-    ScrollView
-} from 'react-native'
+import { StyleSheet, View, ScrollView, ViewStyle } from 'react-native'
 import PageHeader from '@app/frontend/components/global/header'
-import { ColorPalette } from '@app/theme/colors'
 import { User } from '@app/shared/interfaces/user'
-import {UploadController} from "@app/controller/upload";
+import { UploadController } from "@app/controller/upload";
 import UserController from "@app/controller/user";
 import { signOut } from '@app/controller/auth';
 import RoundButton from "@app/frontend/components/global/RoundButton";
@@ -20,14 +14,16 @@ import Select from "@app/frontend/components/global/select";
 import MultiSelect from '@app/frontend/components/global/multiSelect';
 import ImagePicker from '@app/frontend/components/global/imagePicker';
 import DatePicker from '@app/frontend/components/global/datepicker';
+import { validateUser } from '@app/shared/actions/validation';
+import ToastDialog from '@app/frontend/components/global/toast';
+import { useToast } from 'native-base';
 
 const ProfileScreen = () => {
-    const {profile: currentUser, setProfile } = useContext(UserContext) as {
-        profile: User,
-        setProfile: (profile: User) => void
+    const {profile: currentUser} = useContext(UserContext) as {
+        profile: User
     }
     const [date, setDate] = useState<Date|null>(
-        currentUser.dateAndTimeOfBirth ? new Date(currentUser.dateAndTimeOfBirth) : null
+        currentUser.dateAndTimeOfBirth
     );
     const [ name, setName ] = useState<string>(currentUser.name || '')
     const [ sex, setSex ] = useState<User.SexType|null>(currentUser.sex)
@@ -35,7 +31,7 @@ const ProfileScreen = () => {
     const [ birthPlace, setBirthPlace ] = useState<string>(currentUser.placeOfBirth || '')
     const [ updatedPic, setUpdatedPic] = useState<string | null | undefined>(null);
     const [ loading, setLoading ] = useState(false);
-    const [ error, setError ] = useState<string|null>(null);
+    const toast = useToast();
 
     //list of items for select components
     const selectItems = User.sexes.map(sex=>({
@@ -49,12 +45,14 @@ const ProfileScreen = () => {
     const onUploadImage = async () => {
         setLoading(true);
         if (!updatedPic) {
-            return;
+            return currentUser.profilePicture;
         }
         const url = await UploadController.uploadImage({
             uri: updatedPic}
         ).catch((error)=>{
-            setError(error.message);
+            toast.show({
+                render: () => <ToastDialog message={error.message} />
+            });
             setLoading(false);
         });
         return url;
@@ -64,33 +62,44 @@ const ProfileScreen = () => {
      * update user profile in firestore
      */
     const onSaveProfile = async () => {
-        const updatedURL = await onUploadImage();
-        const userProfilePic = typeof updatedURL === 'string' ? 
-                updatedURL : currentUser.profilePicture;
+
+        //upload image if updated and get the new image url
+        const updatedImgURL = await onUploadImage();
+
+        //guard against image upload failed
+        if (typeof updatedImgURL !== "string") {
+            return;
+        }
+
+        //place all the data into a single object to prepare for update
         const data = {
             dateAndTimeOfBirth: date,
             interestedType: interest,
             name,
             placeOfBirth: birthPlace,
-            profilePicture: userProfilePic,
+            profilePicture: updatedImgURL,
             sex
         };
-        const {
-            data: result, 
-            status
-        } = await UserController.updateUser(
-            currentUser.id!, 
-            data
-        );
-        if (status) {
-            setProfile({
-                ...currentUser,
-                ...data
+
+        //guard against invalid data
+        if (!validateUser(data, (error)=> {
+            toast.show({
+                render: () => <ToastDialog message={error} />
             });
-            setLoading(false);
-        } else {
-            setError(result);
+        })) {
+            return;
         }
+
+        //update user profile
+        await UserController.updateUser(
+            currentUser.id!, 
+            data,
+            (error)=>{
+                toast.show({
+                    render: () => <ToastDialog message={error} />
+                });
+            }
+        );
         setLoading(false);
     }
 
@@ -100,9 +109,7 @@ const ProfileScreen = () => {
                 <View
                     style = { styles.container }
                 >
-                    {/* Header of the page */}
                     <PageHeader />
-                    {/* Container */}
                     <View
                         style = { styles.form }
                     >
@@ -128,7 +135,7 @@ const ProfileScreen = () => {
                                 (value) => setSex(value as User.SexType) 
                             }
                             items={selectItems}
-                            style={{marginTop: 20, width: "50%"}}
+                            style={[styles.extraStyle, {width: "50%"}]}
                             placeholder="Select your sex"
                         />
                         <Input
@@ -136,7 +143,7 @@ const ProfileScreen = () => {
                             value = { birthPlace }
                             onChangeText = { (text) => setBirthPlace(text) }
                             placeholder = "Enter your birth place"
-                            style={{marginTop: 20}}
+                            style={styles.extraStyle}
                         />
                         <MultiSelect
                             label = "Interested In"
@@ -146,23 +153,21 @@ const ProfileScreen = () => {
                             }
                             items={selectItems}
                             placeholder = "Who are you interested in?"
-                            style={{marginTop: 20}}
+                            style={styles.extraStyle}
                         />
                         <DatePicker
                             label = "Date of Birth"
                             value = { date }
                             onChange = { (value)=> setDate(value) }
-                            style={{marginTop: 20}}
+                            style={styles.extraStyle}
                         />
                         <RoundButton
-                            style={styles.saveButton}
+                            style={styles.extraStyle}
                             title="update"
                             onPress={onSaveProfile}
                         />
                         <RoundButton
-                            style={[styles.saveButton, {
-                                marginTop: 30,
-                            }]}
+                            style={styles.extraStyle}
                             title="sign out"
                             onPress={signOut}
                         />
@@ -180,17 +185,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1
     },
-    title: {
-        fontSize: 40,
-        color: ColorPalette.SOFT_MAGENTA,
-        textAlign: "center"
-    },
     form: {
         padding: 10,
         paddingLeft: 30,
         flexDirection: "column",
     },
-    saveButton: {
+    extraStyle: {
         marginTop: 20,
     }
 })
