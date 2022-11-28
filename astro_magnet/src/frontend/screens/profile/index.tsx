@@ -87,6 +87,7 @@ const ProfileScreen = () => {
                 render: () => <ToastDialog message={error} />
             });
         })) {
+            setLoading(false);
             return;
         }
 
