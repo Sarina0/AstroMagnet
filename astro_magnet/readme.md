@@ -17,7 +17,7 @@ you will have to create 1.
     cd android && ./gradlew signingReport
   ``` 
     - After that copy the SHA-1 belong to 'debugAndroidTest' to firebase console(check firebases doc to see where to put this).  
-1. Run 
+4. Run 
 ```bat
  npx expo prebuild
 ```
