@@ -34,8 +34,8 @@ you will have to create 1.
   pod 'GoogleUtilities', :modular_headers => true
   pod 'RNFBFirestore', :path => '../node_modules/@react-native-firebase/firestore', :modular_headers => true
 ```
-1. Start your android emulator by going to android studio->start an emulator of your choice
-2. Run
+5. Start your android emulator by going to android studio->start an emulator of your choice
+6. Run
 ```bat
 npx expo run:android
 ```
