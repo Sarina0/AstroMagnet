@@ -4,8 +4,9 @@ const sexes = ["male", "female", "other"];
 
 export const validateUser = (
     user: Partial<User>, 
+    onError?: (message: string)=> void,
     validateEmail?: boolean,
-    onError?: (message: string)=> void
+    
 ) => {
 
     //guard against empty fields
