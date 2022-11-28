@@ -8,8 +8,11 @@ import * as Location from "expo-location";
 import {UserContext} from "@app/store/user";
 import UserController from "@app/controller/user";
 import SafeArea from "@app/frontend/components/global/safeArea";
+import { useToast } from "native-base";
+import ToastDialog from "@app/frontend/components/global/toast";
 
 const HomeScreen = () => {
+    const toast = useToast();
     const [activePage, setActivePage] = useState(HOME_PAGES.HOME);
     const [location, setLocation] = useState(null);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -26,22 +29,33 @@ const HomeScreen = () => {
                 lat: location.coords.latitude,
                 lng: location.coords?.longitude
             };
-            await UserController.updateUser(userId, data);
+            await UserController.updateUser(userId, data, (error)=> {
+                toast.show({
+                    render: () => <ToastDialog message={error} />
+                })
+            });
         }
     }
 
     useEffect(() => {
         (async () => {
+            try {
+                let { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    setErrorMsg('Permission to access location was denied');
+                    return;
+                }
 
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                setErrorMsg('Permission to access location was denied');
-                return;
+                let location = await Location.getCurrentPositionAsync({});
+                console.log('location =====>', location);
+                updateGeoLocation(location);
+            } catch (error) {
+                console.log("[LOG] get location error", error);
+                toast.show({
+                    render: () => <ToastDialog message="Error gettting location" />
+                });
             }
-
-            let location = await Location.getCurrentPositionAsync({});
-            console.log('location =====>', location);
-            updateGeoLocation(location);
+            
         })();
     }, []);
 
