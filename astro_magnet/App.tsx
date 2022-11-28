@@ -34,11 +34,11 @@ export default function App() {
         screen = <Register/>
     }
 
-    if (status === "authenticated" && !profile) {
+    if (status === "authenticated" && !profile && !profileLoading) {
         screen = <SetupScreen/>
     }
 
-    if (status === "authenticated" && profile) {
+    if (status === "authenticated" && profile && !profileLoading) {
         screen = (
             <UserContext.Provider value={{ profile, authUser, setProfile }}>
                     <SafeAreaProvider>
