@@ -1,277 +1,182 @@
-import React, {useRef, useState, useEffect} from 'react';
-import {
-    StyleSheet,
-    Text,
-    View,
-    TextInput,
-    TouchableOpacity,
-    Platform, ScrollView
-} from 'react-native'
-import FastImage from "react-native-fast-image";
-import * as ImagePicker from 'expo-image-picker';
-import moment from 'moment';
-
-import Background from '../../components/background'
-import PageHeader from '../../components/header'
-import { ColorPalette } from '../../styles/colorPalette'
-import  DateTimePicker, { DateTimePickerEvent }  from "@react-native-community/datetimepicker"
-import { Friend, User } from '../../../shared/interfaces/user'
-import SexDialog from '../../components/sexDialog'
-import {state} from "../../../store";
-import Images from "../../../theme/images";
-import { TOAST_SHOW_TIME } from "../../../config";
-import {UploadController} from "../../../controller/upload";
-import { UserController } from "../../../controller/user";
-import RoundButton from "../../components/RoundButton";
-import LoadingOverlay from "../../components/LoadingOverlay";
-import {userState} from "../../../store/user";
+import { useState, useContext } from 'react';
+import {UserContext} from '@app/store/user';
+import { StyleSheet, View, ScrollView, ViewStyle } from 'react-native'
+import PageHeader from '@app/frontend/components/global/header'
+import { User } from '@app/shared/interfaces/user'
+import { UploadController } from "@app/controller/upload";
+import UserController from "@app/controller/user";
+import { signOut } from '@app/controller/auth';
+import RoundButton from "@app/frontend/components/global/RoundButton";
+import LoadingOverlay from "@app/frontend/components/LoadingOverlay";
+import SafeArea from '@app/frontend/components/global/safeArea';
+import Input from "@app/frontend/components/global/input";
+import Select from "@app/frontend/components/global/select";
+import MultiSelect from '@app/frontend/components/global/multiSelect';
+import ImagePicker from '@app/frontend/components/global/imagePicker';
+import DatePicker from '@app/frontend/components/global/datepicker';
+import { validateUser } from '@app/shared/actions/validation';
+import ToastDialog from '@app/frontend/components/global/toast';
+import { useToast } from 'native-base';
 
 const ProfileScreen = () => {
-
-    const [datePicker, setDatePicker] = useState(false);
-    const [timePicker, setTimePicker] = useState(false);
-    const [sexDialogPicker, setSexDialogPicker] = useState<boolean>(false)
-    const [interestDialogPicker, setInterestDialogPicker] = useState<boolean>(false)
-
-
-
-    const currentUser = state.user.currentUser;
-    console.log('current user =====>', currentUser, state.user);
-
-    const [date, setDate] = useState<Date>(currentUser.dateAndTimeOfBirth ? new Date(currentUser.dateAndTimeOfBirth) : new Date());
+    const {profile: currentUser} = useContext(UserContext) as {
+        profile: User
+    }
+    const [date, setDate] = useState<Date|null>(
+        currentUser.dateAndTimeOfBirth
+    );
     const [ name, setName ] = useState<string>(currentUser.name || '')
-    const [ sex, setSex ] = useState<User.SexType>(currentUser.sex || User.SexType.Other)
-    const [ interest, setInterest ] = useState<string>(currentUser.interestedType || '')
+    const [ sex, setSex ] = useState<User.SexType|null>(currentUser.sex)
+    const [ interest, setInterest ] = useState<User.SexType[]>(currentUser.interestedType)
     const [ birthPlace, setBirthPlace ] = useState<string>(currentUser.placeOfBirth || '')
-    const [ profilePicture, setProfilePicture ] = useState<string>(currentUser.profilePicture)
-    const [ avatar, setAvatar ] = useState(null);
+    const [ updatedPic, setUpdatedPic] = useState<string | null | undefined>(null);
     const [ loading, setLoading ] = useState(false);
-    const [ error, setError ] = useState(null);
+    const toast = useToast();
 
-    function onDateSelected(e: DateTimePickerEvent, value: Date | undefined): void {
-        if(value != undefined) {
-            setDate(value);
+    //list of items for select components
+    const selectItems = User.sexes.map(sex=>({
+        label: sex,
+        value: sex
+    }))
+
+    /**
+     * upload image to firebase storage
+     */
+    const onUploadImage = async () => {
+        setLoading(true);
+        if (!updatedPic) {
+            return currentUser.profilePicture;
         }
-        setTimePicker(false);
-        setDatePicker(false);
-    };
-
-
-    const getDateString = (): string => {
-        let month = ""
-        switch (date.getMonth()) {
-            case 0:
-                month = "Jan";
-                break;
-            case 1:
-                month = "Feb";
-                break;
-            case 2:
-                month = "Mar";
-                break;
-            case 3:
-                month = "Apr";
-                break;
-            case 4:
-                month = "May";
-                break;
-            case 5:
-                month = "Jun";
-                break;
-            case 6:
-                month = "Jul";
-                break;
-            case 7:
-                month = "Aug";
-                break;
-            case 8:
-                month = "Sep";
-                break;
-            case 9:
-                month = "Oct";
-                break;
-            case 10:
-                month = "Nov";
-                break;
-            case 11:
-                month = "Dec"
-                break;
-        }
-
-        return `${date.getDate()} ${month} ${date.getFullYear()}`
+        const url = await UploadController.uploadImage({
+            uri: updatedPic}
+        ).catch((error)=>{
+            toast.show({
+                render: () => <ToastDialog message={error.message} />
+            });
+            setLoading(false);
+        });
+        return url;
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////// Image Picker. //////////////////////////////////////
-    ///////////////////////////////////////////////////////////////////////////////////
-    const pickImageAsync = async () => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            allowsEditing: true,
-            quality: 1,
-        });
-        setLoading(true);
-        if (!result.canceled) {
-            setProfilePicture(result.uri);
-            setAvatar(result);
-            setLoading(false);
-        } else {
-            setLoading(false);
-            alert('You did not select any image.');
-        }
-    };
-
+    /**
+     * update user profile in firestore
+     */
     const onSaveProfile = async () => {
-        setLoading(true);
-        let userAvatar = profilePicture;
-        if (avatar) {
-            const uploadedUrl = await UploadController.uploadImage(avatar);
-            userAvatar = uploadedUrl;
+
+        //upload image if updated and get the new image url
+        const updatedImgURL = await onUploadImage();
+
+        //guard against image upload failed
+        if (typeof updatedImgURL !== "string") {
+            return;
         }
-        const userId = currentUser.userId;
+
+        //place all the data into a single object to prepare for update
         const data = {
-            dateAndTimeOfBirth: moment(date).toISOString(),
+            dateAndTimeOfBirth: date,
             interestedType: interest,
             name,
             placeOfBirth: birthPlace,
-            profilePicture: userAvatar,
+            profilePicture: updatedImgURL,
             sex
         };
-        const {user, status, error} = await UserController.updateUser(userId, data);
-        if (status) {
-            state.user.currentUser = {
-                ...currentUser,
-                ...data,
-            };
-        } else {
-            setError(error);
+
+        //guard against invalid data
+        if (!validateUser(data, (error)=> {
+            toast.show({
+                render: () => <ToastDialog message={error} />
+            });
+        })) {
+            setLoading(false);
+            return;
         }
+
+        //update user profile
+        await UserController.updateUser(
+            currentUser.id!, 
+            data,
+            (error)=>{
+                toast.show({
+                    render: () => <ToastDialog message={error} />
+                });
+            }
+        );
         setLoading(false);
     }
 
     return (
-        <Background>
+        <SafeArea>
             <ScrollView style={{flex: 1}}>
                 <View
                     style = { styles.container }
                 >
-                    {/* Header of the page */}
                     <PageHeader />
-                    {/* Container */}
                     <View
                         style = { styles.form }
                     >
-
-                        <Text
-                            style = { styles.font }
-                        >
-                            Name
-                        </Text>
-                        <TextInput
-                            style = { styles.textField }
+                        <ImagePicker
+                            fallback={currentUser.profilePicture}
+                            value={updatedPic}
+                            onChange={(value)=>setUpdatedPic(value)} 
+                            labelStyle={{marginTop: 20}}
+                            style={{marginVertical: 10}}
+                            mode="avatar"
+                        />
+                        <Input
+                            label = "Name"
                             value = { name }
-                            onChangeText = { it => setName(it) }
+                            onChangeText = { (text) => setName(text) }
+                            placeholder = "Enter your name"
+                            style={{marginTop: 20}}
                         />
-                        <Text
-                            style = { styles.font }
-                        >
-                            Sex
-                        </Text>
-                        <Text
-                            style = { styles.textField }
-                            onPress = { () => { setSexDialogPicker(true) } }
-                        >
-                            { sex }
-                        </Text>
-                        <Text
-                            style = { styles.font }
-                        >
-                            Date and time of Birth
-                        </Text>
-                        <Text
-                            style = { styles.textField }
-                        >
-                            <Text
-                                onPress={() => {setDatePicker(true)}}
-                            >
-                                {getDateString()}
-                            </Text>
-                            <Text>
-                                {"\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"}
-                            </Text>
-                            <Text
-                                onPress={() => {setTimePicker(true)}}
-                            >
-                                {date.getHours()}:{date.getMinutes().toString().length == 1 ? "0" + date.getMinutes() : date.getMinutes()}
-                            </Text>
-
-                        </Text>
-                        <Text
-                            style = { styles.font }
-                        >
-                            Place of Birth
-                        </Text>
-                        <TextInput
-                            style = { styles.textField }
+                        <Select
+                            label = "Sex"
+                            value= {sex}
+                            onValueChange = { 
+                                (value) => setSex(value as User.SexType) 
+                            }
+                            items={selectItems}
+                            style={[styles.extraStyle, {width: "50%"}]}
+                            placeholder="Select your sex"
+                        />
+                        <Input
+                            label = "Birth Place"
                             value = { birthPlace }
-                            onChangeText = { it => setBirthPlace(it) }
+                            onChangeText = { (text) => setBirthPlace(text) }
+                            placeholder = "Enter your birth place"
+                            style={styles.extraStyle}
                         />
-                        <Text
-                            style = { styles.font }
-                        >
-                            Interest in
-                        </Text>
-                        <TextInput
-                            style = { styles.textField }
+                        <MultiSelect
+                            label = "Interested In"
                             value = { interest }
-                            onChangeText = { it => setInterest(it) }
+                            onValueChange = { 
+                                (selected) => setInterest(selected as User.SexType[]) 
+                            }
+                            items={selectItems}
+                            placeholder = "Who are you interested in?"
+                            style={styles.extraStyle}
                         />
-                        <Text
-                            style = { styles.font }
-                        >
-                            Upload a picture
-                        </Text>
-                        <TouchableOpacity onPress={pickImageAsync}>
-                            <FastImage
-                                style={styles.profilePicture}
-                                source={profilePicture ? {uri: profilePicture} : Images.avatar_placeholder}
-                            />
-                        </TouchableOpacity>
+                        <DatePicker
+                            label = "Date of Birth"
+                            value = { date }
+                            onChange = { (value)=> setDate(value) }
+                            style={styles.extraStyle}
+                        />
+                        <RoundButton
+                            style={styles.extraStyle}
+                            title="update"
+                            onPress={onSaveProfile}
+                        />
+                        <RoundButton
+                            style={styles.extraStyle}
+                            title="sign out"
+                            onPress={signOut}
+                        />
                     </View>
-                    <RoundButton
-                        style={styles.saveButton}
-                        title={'Save'}
-                        onPress={onSaveProfile}
-                    />
-
-                    {
-                        sexDialogPicker ?
-                            <SexDialog
-                                setValue={ setSex }
-                                setDialogPicker={ setSexDialogPicker } /> : null
-                    }
-
-                    {datePicker && (
-                        <DateTimePicker
-                            value={date}
-                            mode={'date'}
-                            is24Hour={true}
-                            onChange={onDateSelected}
-                        />
-                    )}
-
-                    {timePicker && (
-                        <DateTimePicker
-                            value={date}
-                            mode={'time'}
-                            is24Hour={false}
-                            onChange={onDateSelected}
-                        />
-                    )}
-
                 </View>
             </ScrollView>
             {loading && <LoadingOverlay />}
-        </Background>
+        </SafeArea>
     )
 }
 
@@ -281,43 +186,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1
     },
-    title: {
-        fontSize: 40,
-        color: ColorPalette.SOFT_MAGENTA,
-        textAlign: "center"
-    },
     form: {
         padding: 10,
-        paddingLeft: 30
+        paddingLeft: 30,
+        flexDirection: "column",
     },
-    font: {
-        color: ColorPalette.SOFT_MAGENTA,
-        fontSize: 20,
-        fontWeight: "bold",
-        marginBottom: 10,
-    },
-    textField: {
-        backgroundColor: ColorPalette.DARK_VIOLET_1,
-        color: ColorPalette.SOFT_MAGENTA,
-        padding: 5,
-        paddingLeft: 10,
-        borderRadius: 10,
-        fontSize: 20,
-        marginRight: 30,
-        marginBottom: 15,
-    },
-    textFlex: {
-        flex: 1,
-        flexDirection: "row",
-        minHeight: 40,
-    },
-    profilePicture: {
-        width: 80,
-        height: 80,
-        borderRadius: 40
-    },
-    saveButton: {
-        marginHorizontal: 20,
-        marginVertical: 10
+    extraStyle: {
+        marginTop: 20,
     }
 })

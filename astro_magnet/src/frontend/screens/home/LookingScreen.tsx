@@ -1,138 +1,128 @@
 import {
-    StyleSheet,
+    StyleSheet, View,
     Text, TouchableOpacity,
-    View,
-    Image,
-    Dimensions
+    Image, Dimensions
 } from 'react-native'
-import React, {useEffect, useState} from "react";
+import {useEffect, useState, useContext} from "react";
 import FastImage from "react-native-fast-image";
-
-import {UserController} from "../../../controller/user";
-import {ColorPalette} from "../../styles/colorPalette";
-import Images from "../../../theme/images";
-import {state} from "../../../store";
-import LoadingOverlay from "../../components/LoadingOverlay";
-import EmptyView from "../../components/EmptyView";
+import UserController from "@app/controller/user";
+import {ColorPalette} from "@app/theme/colors";
+import Images from "@app/theme/images";
+import {UserContext} from "@app/store/user";
+import LoadingOverlay from "@app/frontend/components/LoadingOverlay";
+import EmptyView from "@app/frontend/components/EmptyView";
+import useUsers from '@app/hooks/useUsers';
+import { FireDoc as doc } from '@app/shared/interfaces/firebase';
+import { getAge } from '@app/shared/actions/time';
+import { useToast } from 'native-base';
+import ToastDialog from '@app/frontend/components/global/toast';
 
 const width = Dimensions.get('window').width;
 
 const LookingScreen = () => {
-    const [users, setUsers] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [activeUser, setActiveUser] = useState(null);
-    const [activeUserIndex, setActiveUserIndex] = useState(0);
+    const toast = useToast();
+    const { profile } = useContext(UserContext);
+    const {users, loading} = useUsers((error)=> {
+        toast.show({
+            render: () => <ToastDialog message={error} />
+        });
+    });
+    const [activeUser, setActiveUser] = useState<doc|null|undefined>(null);
+    const [activeUserIndex, setActiveUserIndex] = useState(
+       users.length> 0? users.indexOf(activeUser!): 0
+    );
 
-    const currentUser = state.user.currentUser;
-
-    const loadAllUsers = async () => {
-        setLoading(true);
-        const {users: _users} = await UserController.getAllUsers();
-        const allUsers = [];
-        for (const user of _users) {
-            const userId = user._ref._documentPath._parts[1];
-            if (userId !== currentUser.userId) {
-                const like = currentUser.like || [];
-                const dislike = currentUser.dislike || [];
-                const likeIndex = like.indexOf(userId);
-                const dislikeIndex = dislike.indexOf(userId);
-                if (likeIndex < 0 && dislikeIndex < 0) {
-                    allUsers.push({
-                        ...user._data,
-                        userId
-                    });
-                }
-            }
-
+    //load first user when users finished fetching
+    useEffect(()=> {
+        if (users.length > 0 && loading) {
+            setActiveUser(users[0]);
         }
-        if (allUsers.length > 0) {
-            setActiveUser(allUsers[0]);
+    }, [users, loading])
 
-        }
-        setUsers(allUsers);
-    }
-
+    /**
+     * on like button pressed
+     */
     const onLike = async () => {
-        if (users.length > activeUserIndex) {
-            setLoading(true);
-
-            const likeUser = users[activeUserIndex].userId;
-            users.splice(activeUserIndex, 1);
-            setUsers(users);
-
-            setTimeout(() => {
-                if (users.length > 0) {
-                    setActiveUser(users[activeUserIndex]);
-                } else {
-                    setActiveUserIndex(0);
-                    setActiveUser(null);
-                }
-            }, 300);
-
-            await UserController.likeUser(currentUser.userId, likeUser)
-            const likes = currentUser.like || [];
-            likes.push(likeUser);
-            state.user.currentUser = {
-                ...currentUser,
-                like: likes
-            };
-            setLoading(false);
+        if (users.indexOf(activeUser!) === users.length - 1) {
+            setActiveUser(users[0]);
+            setActiveUserIndex(0);
+        } else {
+            setActiveUser(users[users.indexOf(activeUser!) + 1]);
+            setActiveUserIndex(users.indexOf(activeUser!) + 1);
         }
+        await UserController.likeUser(
+            profile?.id!, 
+            activeUser!.id, 
+            (error)=> {
+                toast.show({
+                    render: () => <ToastDialog message={error} />
+                })
+            }
+        );
     }
 
+    /**
+     * on dislike button pressed
+     */
     const onDislike = async () => {
-        if (users.length > activeUserIndex) {
-            setLoading(true);
+        if (users.indexOf(activeUser!) === users.length - 1) {
+            setActiveUser(users[0]);
+            setActiveUserIndex(0);
+        } else {
+            setActiveUser(users[users.indexOf(activeUser!) + 1]);
+            setActiveUserIndex(users.indexOf(activeUser!) + 1);
+        }
+        await UserController.dislikeUser(
+            profile?.id!, 
+            activeUser!.id,
+            (error)=> {
+                toast.show({
+                    render: () => <ToastDialog message={error} />
+                })
+            }
+        );
+    }
 
-            const dislikeUser = users[activeUserIndex].userId;
-            users.splice(activeUserIndex, 1);
-            setUsers(users);
-
-            setTimeout(() => {
-                if (users.length > 0) {
-                    setActiveUser(users[activeUserIndex]);
-                } else {
-                    setActiveUserIndex(0);
-                    setActiveUser(null);
-                }
-            }, 300);
-
-            await UserController.dislikeUser(currentUser.userId, dislikeUser)
-            const dislikes = currentUser.dislike || [];
-            dislikes.push(dislikeUser);
-            state.user.currentUser = {
-                ...currentUser,
-                dislike: dislikes
-            };
-            setLoading(false);
+    /**
+     * on next button pressed
+     */
+    const onNextUser = () => {
+        if (activeUserIndex < users.length - 1) {
+            setActiveUserIndex(activeUserIndex + 1);
+            setActiveUser(users[activeUserIndex + 1]);
+        } else {
+            setActiveUserIndex(0);
+            setActiveUser(users[0]);
         }
     }
 
-    const onNextUser = () => {
-        setActiveUser(users[activeUserIndex + 1]);
-        setActiveUserIndex(activeUserIndex + 1)
-    }
-
+    /**
+     * on previous button pressed
+     */
     const onPrevUser = () => {
-        setActiveUser(users[activeUserIndex - 1]);
-        setActiveUserIndex(activeUserIndex - 1);
+        if (activeUserIndex > 0) {
+            setActiveUserIndex(activeUserIndex - 1);
+            setActiveUser(users[activeUserIndex - 1]);
+        } else {
+            setActiveUser(users[users.length - 1]);
+            setActiveUserIndex(users.length - 1);
+        }
     }
 
-    const toRad = Value => {
+    const toRad = (Value:any) => {
         return (Value * Math.PI) / 180;
     };
 
-    const getCompatibility = (user) => {
-        const currentUser = state.user.currentUser;
-        if (currentUser && user) {
-            let lat1 = currentUser.lat;
-            let lng1 = currentUser.lng;
+    const getCompatibility = (user:doc) => {
+        if (profile && user) {
+            let lat1 = profile.lat;
+            let lng1 = profile.lng;
             let lat2 = user.lat;
             let lng2 = user.lng;
 
             let R = 6371; // km
-            let dLat = toRad(lat2 - lat1);
-            let dLon = toRad(lng2 - lng1);
+            let dLat = toRad(lat2 - lat1!);
+            let dLon = toRad(lng2 - lng1!);
             lat1 = toRad(lat1);
             lat2 = toRad(lat2);
 
@@ -146,43 +136,25 @@ const LookingScreen = () => {
         return 0;
     }
 
-    const getAge = () => {
-        const birthYear = new Date(activeUser.dateAndTimeOfBirth).getFullYear();
-        const curYear= new Date().getFullYear();
-        return curYear - birthYear;
-    }
-
-    useEffect(() => {
-        (async () => {
-            setLoading(true);
-            await loadAllUsers();
-            setLoading(false);
-        })();
-    }, []);
-
     return (
         <View style={styles.container}>
             {activeUser ? (
                 <View style={styles.userContainer}>
                     <View style={styles.selectorWrapper}>
-                        {activeUserIndex > 0 ? (
-                          <TouchableOpacity onPress={onPrevUser}>
-                              <Image style={styles.arrowImage} source={Images.icon_arrow_left}/>
-                          </TouchableOpacity>
-                        ) : <Image style={styles.arrowImage} />}
+                        <TouchableOpacity onPress={onPrevUser}>
+                            <Image style={styles.arrowImage} source={Images.icon_arrow_left}/>
+                        </TouchableOpacity>
                         <Text style={styles.nameText}>{activeUser.name || ''}</Text>
-                        {activeUserIndex < users.length - 1 ? (
-                            <TouchableOpacity onPress={onNextUser}>
-                                <Image style={styles.arrowImage} source={Images.icon_arrow_right}/>
-                            </TouchableOpacity>
-                        ) : <Image style={styles.arrowImage} />}
+                        <TouchableOpacity onPress={onNextUser}>
+                            <Image style={styles.arrowImage} source={Images.icon_arrow_right}/>
+                        </TouchableOpacity>
                     </View>
                     <View style={styles.compatibilityWrapper}>
                         <Text style={styles.compatibilityText}>Compatibility: {getCompatibility(activeUser)}%</Text>
                     </View>
                     <View style={styles.userInfo}>
                         <FastImage style={styles.avatar} source={activeUser.profilePicture ? {uri: activeUser.profilePicture} : Images.avatar_placeholder} />
-                        <Text style={styles.ageText}>Age: {getAge()}</Text>
+                        <Text style={styles.ageText}>Age: {getAge(activeUser.dateAndTimeOfBirth.toDate())}</Text>
                     </View>
                     <View style={styles.actionWrapper}>
                         <TouchableOpacity onPress={onLike}>
@@ -256,8 +228,8 @@ const styles = StyleSheet.create({
         bottom: 10,
         width: '100%',
         textAlign: 'center',
-        color: 'blue',
-        fontSize: 30
+        color: "white",
+        fontSize: 30,
+        backgroundColor: "rgba(0,0,0,0.5)",
     }
-
 })

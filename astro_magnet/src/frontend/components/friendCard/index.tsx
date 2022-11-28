@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image } from 'react-native'
-import { ColorPalette } from '../../styles/colorPalette';
+import { ColorPalette } from '@app/theme/colors';
 
 interface Props {
     /**
@@ -27,7 +27,6 @@ interface Props {
 const FriendCard = (props: Props) => {
     const { profilePicture, personName, lastMessageTime = "" } = props;
 
-
     return (
         <View style={ styles.container }>
             <Image 
@@ -36,7 +35,7 @@ const FriendCard = (props: Props) => {
                     uri: profilePicture
                 }}/>
             <View style={ styles.textContainer }>
-                <Text style={ styles.titleName }>
+                <Text className="text-lg text-secondary">
                     { personName }
                 </Text>
                 {

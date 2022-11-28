@@ -1,22 +1,21 @@
 import {
     StyleSheet,
-    Text, TouchableOpacity,
-    View,
+    Text, View,
 } from 'react-native'
-import React, {useState, useEffect} from "react";
-import * as Location from 'expo-location';
+import { ColorPalette } from '@app/theme/colors'
+import RoundButton from "@app/frontend/components/global/RoundButton";
 
-import { ColorPalette } from '../../styles/colorPalette'
-import RoundButton from "../../components/RoundButton";
-
-const SelectScreen = (props) => {
-
+const SelectScreen = (props: any) => {
     return (
         <View style={styles.container}>
             <View style={styles.banner}>
-                <Text style={styles.bannerText}>Find Compatible Companions</Text>
+                <Text style={styles.bannerText}>
+                    Find Compatible Companions
+                </Text>
             </View>
-            <Text style={styles.descriptionText}>Start looking for compatible people around you</Text>
+            <Text style={styles.descriptionText}>
+                Start looking for compatible people around you
+            </Text>
             <View style={styles.footer}>
                 <RoundButton
                     style={styles.footerButton}
@@ -65,5 +64,4 @@ const styles = StyleSheet.create({
     footerButton: {
         width: '100%'
     }
-
 })

@@ -1,25 +1,21 @@
-import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin'
-import { FirebaseAuthTypes } from "@react-native-firebase/auth"
-import auth from '@react-native-firebase/auth';
 import {Platform} from 'react-native'
 import storage from '@react-native-firebase/storage';
-import firestore from '@react-native-firebase/firestore';
-import Messages from "../../theme/messages";
+
 
 /**
  * Upload controller to handle upload
  */
-export abstract class UploadController {
+export class UploadController {
 
     constructor() {
-        throw new Error("Controller cannot be initialized")
+        throw new Error("UploadController is a static class");
     }
 
     /**
      * upload image to firebase storage
      * @returns returns user info
      */
-    static async uploadImage(image): any {
+    static async uploadImage(image: {uri: string}): Promise<string> {
         let fileName = '';
         let fileUri = image.uri;
 
@@ -31,7 +27,7 @@ export abstract class UploadController {
             randomText += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
 
-        fileName = image.fileName ? image.fileName : randomText + '.jpg';
+        fileName = randomText + '.jpg';
 
         if (Platform.OS === 'ios') {
             if (fileUri.indexOf('file://') === 0) {
@@ -42,15 +38,16 @@ export abstract class UploadController {
                 fileUri = 'file://' + fileUri;
             }
         }
-
         console.log('upload file ======>', fileName, fileUri);
-
         const eventReference = storage().ref(fileName);
         await eventReference.putFile(fileUri);
         const uploadedImage = await storage()
             .ref('/' + fileName)
-            .getDownloadURL();
-
+            .getDownloadURL()
+            .catch((error) => {
+                console.log("[LOG] error:", error)
+                throw new Error(error.message)
+            })
         return uploadedImage;
     }
 }
