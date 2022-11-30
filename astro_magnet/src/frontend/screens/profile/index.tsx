@@ -19,17 +19,28 @@ import ToastDialog from '@app/frontend/components/global/toast';
 import { useToast } from 'native-base';
 
 const ProfileScreen = () => {
-    const {profile: currentUser} = useContext(UserContext) as {
-        profile: User
-    }
+    const {
+        profile: currentUser,
+        authUser
+    } = useContext(UserContext);
     const [date, setDate] = useState<Date|null>(
-        currentUser.dateAndTimeOfBirth
+        currentUser?.dateAndTimeOfBirth ?? null
     );
-    const [ name, setName ] = useState<string>(currentUser.name || '')
-    const [ sex, setSex ] = useState<User.SexType|null>(currentUser.sex)
-    const [ interest, setInterest ] = useState<User.SexType[]>(currentUser.interestedType)
-    const [ birthPlace, setBirthPlace ] = useState<string>(currentUser.placeOfBirth || '')
-    const [ updatedPic, setUpdatedPic] = useState<string | null | undefined>(null);
+    const [ name, setName ] = useState<string>(
+        currentUser?.name ?? ""
+    )
+    const [ sex, setSex ] = useState<User.SexType|null>(
+        currentUser?.sex ?? null
+    )
+    const [ interest, setInterest ] = useState<User.SexType[]>(
+        currentUser?.interestedType ?? []
+    )
+    const [ birthPlace, setBirthPlace ] = useState<string>(
+        currentUser?.placeOfBirth ?? ""
+    )
+    const [ updatedPic, setUpdatedPic] = useState<string | null | undefined>(
+        currentUser?.profilePicture ?? undefined
+    );
     const [ loading, setLoading ] = useState(false);
     const toast = useToast();
 
@@ -45,11 +56,13 @@ const ProfileScreen = () => {
     const onUploadImage = async () => {
         setLoading(true);
         if (!updatedPic) {
-            return currentUser.profilePicture;
+            return currentUser?.profilePicture;
         }
         const url = await UploadController.uploadImage({
-            uri: updatedPic}
-        ).catch((error)=>{
+            uri: updatedPic,
+            name: authUser?.photoURL ?? undefined
+        })
+        .catch((error)=>{
             toast.show({
                 render: () => <ToastDialog message={error.message} />
             });

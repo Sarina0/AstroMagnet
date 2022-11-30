@@ -25,8 +25,8 @@ export type UserContextType = {
 
 /**
  * user context
- * @property {User | null} user - user
- * @property {FirebaseAuthTypes.User | null} firebaseUser - firebase user
+ * @property {User | null} profile - user
+ * @property {FirebaseAuthTypes.User | null} authUser - firebase user
  */
 export const UserContext = createContext<UserContextType>({
 
