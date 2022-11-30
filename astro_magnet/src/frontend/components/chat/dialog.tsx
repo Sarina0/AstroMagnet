@@ -27,8 +27,8 @@ export default function Dialog(props: Message) {
                 height={50}
                 rounded="full"
                 overflow="hidden"
-                mr={isCurrentUser ? 0 : 3}
-                ml={isCurrentUser ? 3 : 0}
+                mr={isCurrentUser ? 2 : 3}
+                ml={isCurrentUser ? 3 : 2}
                 alignSelf={"flex-start"}
             >
                 <Image

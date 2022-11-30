@@ -1,6 +1,5 @@
 import { Input, Icon, Box } from "native-base";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import {TextInput} from "react-native";
 
 interface Props {
     value: string;
@@ -23,6 +22,7 @@ export default function InputComponent(props: Props) {
             paddingX={4}
             alignItems="center"
             flexDirection="row"
+            
         >
             <Input
                 bgColor="onSecondary"
@@ -42,6 +42,7 @@ export default function InputComponent(props: Props) {
                         onPress={props.onSend}
                     />
                 }
+                onSubmitEditing={props.onSend}
             />
         </Box>
     )
