@@ -2,7 +2,6 @@ import {useState, useEffect} from "react";
 import firestore from "@react-native-firebase/firestore";
 import useAuthState from "./useAuthState";
 import { User } from "@app/shared/interfaces/user";
-import { FirebaseAuthTypes } from "@react-native-firebase/auth";
 
 /**
  * hooks to setup user profile after user has logged in
@@ -59,8 +58,9 @@ export default function useProfile(
             return unsubscribe;
         } else {
             setProfileLoading(false);
+            console.log("[LOG] user not logged in")
         }
-    }, [user]);
+    }, [user, status]);
     
     return {
         user,

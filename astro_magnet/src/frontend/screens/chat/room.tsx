@@ -73,44 +73,45 @@ export default function Room(props: {route: {params: {id: string}}}) {
     return (
         <SafeArea>
             {loading && <LoadingOverlay/>}
-            <KeyboardAvoidingView 
+            <Box
                 flex={1}
-                behavior={Platform.OS === "ios" ? "padding" : "height"}
-                keyboardVerticalOffset={100}
-                padding={0}
             >
-                <Box flex={1}>
-                    <Text
-                        fontSize="sm"
-                        color="onSecondary"
-                        textAlign="center"
-                        my={3}
-                    >
-                        Start conversation
-                    </Text>
-                    <FlatList
-                        ref={listRef}
-                        data={messages}
-                        renderItem={({item}) => 
-                            <Dialog
-                                {...item}
-                            />
-                        }
-                        keyExtractor={(item) => item.id}
-                        style={{flex: 1, paddingHorizontal: 10}}
-                    />
-                    <Box
-                        paddingX={3}
-                    >
-                        <Input 
-                            value={message}
-                            onChangeText={setMessage}
-                            placeholder="Type a message"
-                            onSend={onSendMessage}
+                <FlatList
+                    ref={listRef}
+                    data={messages}
+                    renderItem={({item}) => 
+                        <Dialog
+                            {...item}
                         />
-                    </Box>   
-                </Box>
-            </KeyboardAvoidingView>
+                    }
+                    keyExtractor={(item) => item.id}
+                    style={{flex: 1, paddingHorizontal: 10}}
+                    ListHeaderComponent={()=>(
+                        <Text
+                            fontSize="sm"
+                            color="onSecondary"
+                            textAlign="center"
+                            my={3}
+                        >
+                            Start conversation
+                        </Text>
+                    )}
+                />
+                <KeyboardAvoidingView
+                    paddingX={3}
+                    flex={0}
+                    keyboardVerticalOffset={100}
+                    behavior="height"
+                    
+                >
+                    <Input 
+                        value={message}
+                        onChangeText={setMessage}
+                        placeholder="Type a message"
+                        onSend={onSendMessage}
+                    />
+                </KeyboardAvoidingView>   
+            </Box>
         </SafeArea>
     )
 }

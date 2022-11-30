@@ -11,7 +11,7 @@ import {formatChatTime} from "@app/shared/actions/time";
 import { FlatList, Text } from "native-base";
 import { UserContext } from "@app/context/user";
 import EmptyView from '@app/frontend/components/EmptyView';
-import { ChatStackParamList } from '.';
+import { ChatStackParamList } from '../../navigation/chat';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useNavigation } from '@react-navigation/native';
 

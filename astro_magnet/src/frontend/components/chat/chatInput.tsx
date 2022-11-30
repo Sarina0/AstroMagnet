@@ -20,6 +20,7 @@ export default function InputComponent(props: Props) {
     return (
         <Box
             p={2}
+            paddingX={4}
             alignItems="center"
             flexDirection="row"
         >

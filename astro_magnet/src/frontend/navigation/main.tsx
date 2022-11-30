@@ -1,16 +1,16 @@
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import ChatScreen from '@app/frontend/screens/chat';
+import ChatScreen from '@app/frontend/navigation/chat';
 import ProfileScreen from '@app/frontend/screens/profile';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'
 import { ColorPalette } from '@app/theme/colors';
 import { colorWithOpacity } from '@app/shared/actions/colors';
-import { useState, Dispatch, SetStateAction, createContext } from "react";
+import { useState } from "react";
 import { ViewStyle } from 'react-native';
 import LikedScreen from '../screens/home/LikedScreen';
 import LookingScreen from '../screens/home/LookingScreen';
 import { NavigatorScreenParams } from '@react-navigation/native';
-import { ChatStackParamList } from '@app/frontend/screens/chat';
+import { ChatStackParamList } from '@app/frontend/navigation/chat';
 import { MenuContext } from '@app/context/menu';
 
 export type RootStackParamList = {
