@@ -1,7 +1,7 @@
 import {Box, KeyboardAvoidingView, Text } from "native-base";
 import {useContext, useEffect, useState, useRef} from "react";
 import { MenuContext } from "@app/context/menu";
-import { FlatList, Platform } from "react-native";
+import { FlatList, Platform, Keyboard, View, Dimensions} from "react-native";
 import SafeArea from "@app/frontend/components/global/safeArea";
 import useMessage from "@app/hooks/useMessage";
 import { useToast } from 'native-base';
@@ -16,6 +16,7 @@ import firestore from "@react-native-firebase/firestore";
 
 export default function Room(props: {route: {params: {id: string}}}) {
     const { setMenuVisible } = useContext(MenuContext);
+    const [isKeyboardShow, setIsKeyboardShow] = useState<boolean>(false);
     const toast = useToast();
     const { messages, loading } = useMessage(
         props.route.params.id,
@@ -38,11 +39,34 @@ export default function Room(props: {route: {params: {id: string}}}) {
         )
     }, []);
 
+    useEffect(()=>{
+        const keyboardDidShow = Keyboard.addListener(
+            Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+            () => {
+                setIsKeyboardShow(true);
+            }
+        );
+
+        const keyboardDidHide = Keyboard.addListener(
+            Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+            () => {
+                setIsKeyboardShow(false);
+            }
+        );
+
+        return () => {
+            keyboardDidShow.remove();
+            keyboardDidHide.remove();
+        }
+    })
+
     useEffect(() => {
         if (listRef.current) {
             listRef.current.scrollToEnd({animated: false});
         }
     }, [messages]);
+
+    const { height } = Dimensions.get("window");
 
     async function onSendMessage() {
         if (!profile) return;
@@ -73,45 +97,42 @@ export default function Room(props: {route: {params: {id: string}}}) {
     return (
         <SafeArea>
             {loading && <LoadingOverlay/>}
-            <Box
-                flex={1}
-            >
-                <FlatList
-                    ref={listRef}
-                    data={messages}
-                    renderItem={({item}) => 
-                        <Dialog
-                            {...item}
-                        />
-                    }
-                    keyExtractor={(item) => item.id}
-                    style={{flex: 1, paddingHorizontal: 10}}
-                    ListHeaderComponent={()=>(
-                        <Text
-                            fontSize="sm"
-                            color="onSecondary"
-                            textAlign="center"
-                            my={3}
-                        >
-                            Start conversation
-                        </Text>
-                    )}
-                />
-                <KeyboardAvoidingView
-                    paddingX={3}
-                    flex={0}
-                    keyboardVerticalOffset={100}
-                    behavior="height"
-                    
-                >
-                    <Input 
-                        value={message}
-                        onChangeText={setMessage}
-                        placeholder="Type a message"
-                        onSend={onSendMessage}
+            <FlatList
+                ref={listRef}
+                data={messages}
+                renderItem={({item}) => 
+                    <Dialog
+                        {...item}
                     />
-                </KeyboardAvoidingView>   
-            </Box>
+                }
+                keyExtractor={(item) => item.id}
+                style={{flex: 1, paddingHorizontal: 10}}
+                ListHeaderComponent={()=>(
+                    <Text
+                        fontSize="sm"
+                        color="onSecondary"
+                        textAlign="center"
+                        my={3}
+                    >
+                        Start conversation
+                    </Text>
+                )}
+            />
+            <KeyboardAvoidingView
+                behavior="padding"
+            >
+                <Input 
+                    value={message}
+                    onChangeText={setMessage}
+                    placeholder="Type a message"
+                    onSend={onSendMessage}
+                />
+                <View
+                    style={{
+                        height: isKeyboardShow ? height * 0.15 : 5,
+                    }}
+                />
+            </KeyboardAvoidingView>   
         </SafeArea>
     )
 }

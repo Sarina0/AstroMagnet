@@ -1,5 +1,6 @@
 import { Input, Icon, Box } from "native-base";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import {TextInput} from "react-native";
 
 interface Props {
     value: string;
@@ -19,7 +20,6 @@ interface Props {
 export default function InputComponent(props: Props) {
     return (
         <Box
-            p={2}
             paddingX={4}
             alignItems="center"
             flexDirection="row"
@@ -44,6 +44,5 @@ export default function InputComponent(props: Props) {
                 }
             />
         </Box>
-        
     )
 }
