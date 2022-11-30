@@ -60,7 +60,7 @@ const ProfileScreen = () => {
         }
         const url = await UploadController.uploadImage({
             uri: updatedPic,
-            name: authUser?.photoURL ?? undefined
+            name: authUser?.uid,
         })
         .catch((error)=>{
             toast.show({
@@ -106,7 +106,7 @@ const ProfileScreen = () => {
 
         //update user profile
         await UserController.updateUser(
-            currentUser.id!, 
+            currentUser?.id!, 
             data,
             (error)=>{
                 toast.show({
@@ -128,7 +128,7 @@ const ProfileScreen = () => {
                         style = { styles.form }
                     >
                         <ImagePicker
-                            fallback={currentUser.profilePicture}
+                            fallback={currentUser?.profilePicture}
                             value={updatedPic}
                             onChange={(value)=>setUpdatedPic(value)} 
                             labelStyle={{marginTop: 20}}
