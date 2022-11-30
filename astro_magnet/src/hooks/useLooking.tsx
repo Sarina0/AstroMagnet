@@ -58,7 +58,11 @@ export default function useLooking(
         profile?.disliked,
     ]);
     return {
+
+        /** result after look */
         users,
+
+        /** loading state of fetching result */
         loading
     }
 }

@@ -49,6 +49,7 @@ export default function useMessage(
                 setMessages(list as Message[]);
                 setLoading(false);
             }, (error) => {
+                setLoading(false);
                 console.log("[ERROR] error fetching messages:", error);
                 onError && onError("Error fetching messages");
             });
@@ -56,7 +57,10 @@ export default function useMessage(
     }, [chatRoomId, profile]);
 
     return {
+        /** current chat room messages */
         messages,
+
+        /** fetch loading state */
         loading
     }
 }

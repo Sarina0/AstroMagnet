@@ -6,8 +6,20 @@ import { FirebaseAuthTypes } from "@react-native-firebase/auth";
  * user context type
  */
 export type UserContextType = {
+
+    /**
+     * current user profile
+     */
     profile: User | null;
+
+    /**
+     * set current user profile callback
+     */
     setProfile: (user: User | null) => void;
+
+    /**
+     * current user firebase auth
+     */
     authUser: FirebaseAuthTypes.User | null;
 }
 
@@ -17,7 +29,22 @@ export type UserContextType = {
  * @property {FirebaseAuthTypes.User | null} firebaseUser - firebase user
  */
 export const UserContext = createContext<UserContextType>({
+
+    /**
+     * current user profile
+     * @type {User | null}
+     */
     profile: null,
+
+    /**
+     * set current user profile callback
+     * @type {(user: User | null) => void}
+     */
     setProfile: () => {},
+
+    /**
+     * current user firebase auth
+     * @type {FirebaseAuthTypes.User | null}
+     */
     authUser: null
 });
