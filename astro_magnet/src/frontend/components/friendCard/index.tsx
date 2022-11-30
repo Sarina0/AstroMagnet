@@ -43,6 +43,7 @@ const FriendCard = (props: Props) => {
             bgColor="tertiary" borderRadius="lg"
             p={3} flex={1}
             flexDirection="row" alignItems="center"
+            my={2}
         >
             <Image 
                 src={ profilePicture }

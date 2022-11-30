@@ -85,6 +85,7 @@ export default function Room(props: {route: {params: {id: string}}}) {
             <AutoScrollFlatList
                 data={messages}
                 ref={listRef}
+                initialNumToRender={10}
                 renderItem={({item}) => 
                     <Dialog
                         {...item}
@@ -98,7 +99,6 @@ export default function Room(props: {route: {params: {id: string}}}) {
                 }
                 contentContainerStyle={{
                     flexGrow: 1,
-                    justifyContent: "flex-end",
                     paddingBottom: isKeyboardShow ? 0 : 10,
                 }}
                 newItemAlertMessage={(newItem) => `New message: +${newItem}`}
@@ -119,6 +119,7 @@ export default function Room(props: {route: {params: {id: string}}}) {
                         onPress={()=>listRef.current?.scrollToEnd()}
                     />
                 }
+                onMagicTap={() => listRef.current?.scrollToEnd()}
             />
             <Input 
                 value={message}
