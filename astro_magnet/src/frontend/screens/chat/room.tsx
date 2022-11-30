@@ -1,5 +1,5 @@
-import { Text, useToast, Box} from "native-base";
-import {useContext, useEffect, useState } from "react";
+import { Text, useToast, Box, Fab, ArrowDownIcon} from "native-base";
+import {useContext, useEffect, useState, useRef } from "react";
 import { MenuContext } from "@app/context/menu";
 import SafeArea from "@app/frontend/components/global/safeArea";
 import useMessage from "@app/hooks/useMessage";
@@ -14,9 +14,11 @@ import firestore from "@react-native-firebase/firestore";
 import {AutoScrollFlatList} from "react-native-autoscroll-flatlist";
 import useKeyboardHeight from "@app/hooks/useKeyboardHeight";
 import useKeyboard from "@app/hooks/useKeyboard";
+import { ColorPalette } from "@app/theme/colors";
 
 export default function Room(props: {route: {params: {id: string}}}) {
     const toast = useToast();
+    const listRef = useRef<AutoScrollFlatList<Message>>(null);
     const { messages, loading } = useMessage(
         props.route.params.id,
         (error) => {
@@ -82,6 +84,7 @@ export default function Room(props: {route: {params: {id: string}}}) {
             {loading && <LoadingOverlay/>}
             <AutoScrollFlatList
                 data={messages}
+                ref={listRef}
                 renderItem={({item}) => 
                     <Dialog
                         {...item}
@@ -98,7 +101,24 @@ export default function Room(props: {route: {params: {id: string}}}) {
                     justifyContent: "flex-end",
                     paddingBottom: isKeyboardShow ? 0 : 10,
                 }}
-                
+                newItemAlertMessage={(newItem) => `New message: +${newItem}`}
+                newItemAlertContainerStyle={{
+                    backgroundColor: ColorPalette.DARK_VIOLET_2,
+                }}
+                newItemAlertTextStyle={{
+                    color: ColorPalette.SOFT_MAGENTA,
+                }}
+                indicatorComponent={
+                    <Fab
+                        position="absolute"
+                        bottom={100}
+                        right={30}
+                        size="md"
+                        icon={<ArrowDownIcon size="sm" color="onSecondary" />}
+                        backgroundColor="secondary"
+                        onPress={()=>listRef.current?.scrollToEnd()}
+                    />
+                }
             />
             <Input 
                 value={message}
