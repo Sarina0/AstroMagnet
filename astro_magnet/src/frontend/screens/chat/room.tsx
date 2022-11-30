@@ -13,6 +13,7 @@ import { sendMessage } from "@app/controller/message";
 import type { Message } from "@app/shared/interfaces/message";
 import { UserContext } from "@app/context/user";
 import firestore from "@react-native-firebase/firestore";
+import {AutoScrollFlatList} from "react-native-autoscroll-flatlist";
 
 export default function Room(props: {route: {params: {id: string}}}) {
     const { setMenuVisible } = useContext(MenuContext);
@@ -61,10 +62,12 @@ export default function Room(props: {route: {params: {id: string}}}) {
     })
 
     useEffect(() => {
-        if (listRef.current) {
-            listRef.current.scrollToEnd({animated: false});
-        }
-    }, [messages]);
+        listRef.current && listRef.current.scrollToEnd({animated: false});
+        console.log("trigger");
+    }, [
+        messages,
+        loading
+    ]);
 
     const { height } = Dimensions.get("window");
 
@@ -97,26 +100,24 @@ export default function Room(props: {route: {params: {id: string}}}) {
     return (
         <SafeArea>
             {loading && <LoadingOverlay/>}
-            <FlatList
-                ref={listRef}
+            <AutoScrollFlatList
                 data={messages}
                 renderItem={({item}) => 
                     <Dialog
                         {...item}
                     />
                 }
-                keyExtractor={(item) => item.id}
-                style={{flex: 1, paddingHorizontal: 10}}
-                ListHeaderComponent={()=>(
-                    <Text
-                        fontSize="sm"
-                        color="onSecondary"
-                        textAlign="center"
-                        my={3}
-                    >
-                        Start conversation
+                threshold={20}
+                ListHeaderComponent={() => 
+                    <Text color="onSecondary" fontSize="md" textAlign="center" my={2}>
+                        start conversation
                     </Text>
-                )}
+                }
+                contentContainerStyle={{
+                    flexGrow: 1,
+                    justifyContent: "flex-end",
+                    paddingBottom: isKeyboardShow ? 0 : 10,
+                }}
             />
             <KeyboardAvoidingView
                 behavior="padding"

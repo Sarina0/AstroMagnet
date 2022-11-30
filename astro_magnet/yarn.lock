@@ -8054,6 +8054,11 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
+react-native-autoscroll-flatlist@^1.11.2:
+  version "1.11.2"
+  resolved "https://registry.yarnpkg.com/react-native-autoscroll-flatlist/-/react-native-autoscroll-flatlist-1.11.2.tgz#9f1f7114928f17443351a8a53fec26bb1411ab8f"
+  integrity sha512-W0NCcuVZ0uaJBgPGLvDyS1lxRxIyg1tEYx6c8AHr6XX9smjypIJDrEN+2yg2ogBJELoGFjHmtMxWCYPrVxr8Sg==
+
 react-native-codegen@^0.70.6:
   version "0.70.6"
   resolved "https://registry.yarnpkg.com/react-native-codegen/-/react-native-codegen-0.70.6.tgz#2ce17d1faad02ad4562345f8ee7cbe6397eda5cb"

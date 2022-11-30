@@ -68,7 +68,7 @@ const LookingScreen = () => {
             setActiveUser(null);
             count.current = 0;
         } else if (users.length === 1 && !activeUser)  {
-
+            
             //if activeUsers is null and theres new user, set activeUser to the new user
             setActiveUser(users[0]);
         } 
