@@ -2,6 +2,11 @@
 
 /**
  * Color palette used throughout the application
+ * @property {string} SOFT_MAGENTA
+ * @property {string} DESATURATED_MAGENTA
+ * @property {string} DARK_VIOLET_1
+ * @property {string} VIOLET
+ * @property {string} DARK_VIOLET_2
  */
 export enum ColorPalette {
     /**

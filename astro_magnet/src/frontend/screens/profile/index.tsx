@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import {UserContext} from '@app/store/user';
+import {UserContext} from '@app/context/user';
 import { StyleSheet, View, ScrollView, ViewStyle } from 'react-native'
 import PageHeader from '@app/frontend/components/global/header'
 import { User } from '@app/shared/interfaces/user'

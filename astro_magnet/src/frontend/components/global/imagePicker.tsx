@@ -4,6 +4,7 @@ import { Pressable, Box, Text, Icon } from "native-base";
 import { ViewStyle, Dimensions } from 'react-native';
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import FastImage from "react-native-fast-image";
+import Image from "@app/frontend/components/global/image";
 
 interface Props {
     label?: string;
@@ -108,7 +109,7 @@ export default function ImagePickerComponent(props: Props) {
                 overflow="hidden"
                 className="w-full h-full"
             >
-                <FastImage
+                <Image
                     source={{ 
                         uri: getImageSrc(),
                         priority: FastImage.priority.normal,

@@ -1,3 +1,12 @@
+import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
+
+export interface ChatUser {
+    id: string;
+    name: string;
+    profilePicture: string;
+    email: string;
+}
+
 /**
  * Message type
  * @property {string} id - message id
@@ -11,7 +20,7 @@ export interface Message {
     /**
      * Id of the message
      */
-    messageId: string;
+    id?: string;
 
     /**
      * id of the chatroom the message is from.
@@ -21,10 +30,7 @@ export interface Message {
     /**
      * Email of the person who sent the message
      */
-    senderUser: {
-        id: string;
-        email: string;
-    }
+    sendBy: ChatUser;
 
     /**
      * Content of the message being sent
@@ -34,7 +40,12 @@ export interface Message {
     /**
      * Time at which the message was sent
      */
-    timestamp: Date;
+    timestamp: Date
+    
+    /**
+     * created at
+     */
+    createdAt: FirebaseFirestoreTypes.Timestamp;
 
     /**
      * Check if the message has been seen or not
@@ -42,49 +53,28 @@ export interface Message {
     seen: boolean;
 }
 
+/**
+ * chat room type
+ * @property {string | undefined} id - chatroom id
+ * @property {userIds} id of users in chatroom
+ * @property {Message} lastMessage of chatroom
+ */
+
+//chat room collection have subcollection of messages in firestore
 export interface ChatRoom {
     /**
      * Id of the chatroom
-     * @type {string}
+     * @type {string | undefined}
      */
-    chatRoomId: string;
+    id?: string;
 
     /**
-     * Id of the user who created the chatroom
-     * @type {string}
+     * users in the chatroom
      */
-    creatorUser: {
-        id: string;
-        name: string;
-    }
+    users: [ChatUser, ChatUser];
 
     /**
-     * Id of the user who is being messaged
-     * @type {string}
+     * last message sent in the chatroom
      */
-    receiverUser: {
-        id: string;
-        name: string;
-    }
-
-    /**
-     * Id of the last message sent
-     * @type {string}
-     */
-    lastMessageId: string;
-
-    /**
-     * Time at which the last message was sent
-     * @type {Date}
-     */
-    lastMessageTimestamp: Date;
-
-    /**
-     * Id of the user who sent the last message
-     * @type {string}
-     */
-    lastMessageSenderUser: {
-        id: string;
-        name: string;
-    }
+    lastMessage?: Message;
 }

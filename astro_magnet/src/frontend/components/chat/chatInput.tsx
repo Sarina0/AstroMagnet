@@ -8,10 +8,17 @@ interface Props {
     onSend: () => void;
 }
 
+/**
+ * input component for chat
+ * @prop value - value of the input
+ * @prop onChangeText - function to be called when the input changes
+ * @prop placeholder - placeholder text
+ * @prop onSend - function to be called when the send button is pressed
+ * @returns {JSX.Element} input component for chat
+ */
 export default function InputComponent(props: Props) {
     return (
         <Box
-            safeArea
             p={2}
             alignItems="center"
             flexDirection="row"

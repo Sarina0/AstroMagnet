@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View, Image } from 'react-native'
-import { ColorPalette } from '@app/theme/colors';
+import {Box, Text, Pressable} from "native-base";
+import Image from "@app/frontend/components/global/image";
 
 interface Props {
+
     /**
      * Url of the profile picture
      */
@@ -17,6 +18,15 @@ interface Props {
      */
     lastMessageTime?: string;
 
+    /**
+     * last message
+     */
+    lastMessage?: string;
+
+    /**
+     * onPress
+     */
+    onPress?: () => void;
 }
 
 /**
@@ -28,59 +38,64 @@ const FriendCard = (props: Props) => {
     const { profilePicture, personName, lastMessageTime = "" } = props;
 
     return (
-        <View style={ styles.container }>
+        <Pressable 
+            onPress={props.onPress} 
+            bgColor="tertiary" borderRadius="lg"
+            p={3} flex={1}
+            flexDirection="row" alignItems="center"
+        >
             <Image 
-                style={ styles.image }
-                source={{
-                    uri: profilePicture
-                }}/>
-            <View style={ styles.textContainer }>
-                <Text className="text-lg text-secondary">
+                src={ profilePicture }
+                style={{
+                    width: 50,
+                    height: 50,
+                    borderRadius: 25,
+                }}
+            />
+            <Box width="full">
+                <Text 
+                    fontSize={20}
+                    color="secondary"
+                    fontWeight="bold"
+                    ml={5}
+                >
                     { personName }
                 </Text>
-                {
-                    lastMessageTime !== "" &&
-                    <Text style={ styles.message}>
-                        { lastMessageTime }
-                    </Text>
-                }
-            </View>
-        </View>
+                <Box
+                    flexDirection="row"
+                    ml={5}
+                    mt={2}
+                    width="full"
+                    alignItems="center"
+                >
+                    {
+                        props.lastMessage && (
+                            <Text
+                                fontSize="sm"
+                                color="indigo.900"
+                                ellipsizeMode='tail'
+                                flex={0.35}
+                                numberOfLines={1}
+                                isTruncated
+                            >
+                                { props.lastMessage }...
+                            </Text>
+                        )
+                    }
+                    {
+                        lastMessageTime &&
+                        <Text
+                            fontSize="sm"
+                            color="indigo.900"
+                            flex={0.65}
+                        >
+                            { lastMessageTime }
+                        </Text>
+                    }
+                </Box>
+            </Box>
+        </Pressable>
     )
 }
 
 export default FriendCard;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        flexDirection: 'row', 
-        width: 373,
-        maxHeight: 83,
-        backgroundColor: ColorPalette.DESATURATED_MAGENTA,
-        borderRadius: 10,
-        alignItems: "center",
-        marginBottom: 11
-    },
-    image: {
-        width: 50,
-        height: 50,
-        borderRadius: 50,
-        margin: 15
-    },
-    textContainer: {
-        paddingLeft: 10,
-        flex: 1,
-        justifyContent: 'space-between'
-    },
-    titleName: {
-        fontSize: 20,
-        fontWeight: "bold",
-        color: ColorPalette.DARK_VIOLET_2
-    },
-    message: {
-        fontSize: 15,
-        color: ColorPalette.DARK_VIOLET_2,
-        marginTop: 10
-    }
-})

@@ -1,7 +1,8 @@
 import {useEffect, useState, useContext} from "react";
 import firestore from "@react-native-firebase/firestore";
 import { FireDoc } from "@app/shared/interfaces/firebase";
-import { UserContext } from "@app/store/user";
+import { UserContext } from "@app/context/user";
+
 /**
  * use users hooks, fetch all user from firestore
  * users will not include current logged in user
@@ -9,7 +10,7 @@ import { UserContext } from "@app/store/user";
  * @param {(error: string)=>void | undefined} onError - callback function to handle network error
  * @returns {users: FirebaseFirestoreTypes.DocumentData[], loading: boolean} - a list of users and loading state
  */
-export default function useUsers(
+export default function useLooking(
     onError?: (error: string) => void,
 ) {
     const [users, setUsers] = useState<FireDoc[]>([]);
@@ -23,12 +24,26 @@ export default function useUsers(
             .onSnapshot((querySnapshot) => {
                 const list: FireDoc[] = [];
                 querySnapshot.forEach((doc) => {
-                    if (!profile?.liked.includes(doc.id) && !profile?.disliked.includes(doc.id)) {
+                    if (
+                        !profile?.liked.includes(doc.id) && 
+                        !profile?.disliked.includes(doc.id) &&
+                        !profile?.messagingFriendList.map(
+                            (friend) => friend.email
+                        ).includes(doc.data().email) &&
+                        profile.interestedType.includes(doc.data().sex) &&
+                        doc.data().interestedType.includes(profile.sex)
+                        ) {
                         list.push({
                             id: doc.id,
                             ...doc.data(),
                         });
                     }
+                    list.sort((a, b) => {
+                        if (b) {
+                            return a?.createdAt.toDate() - b.createdAt.toDate();
+                        }
+                        return 0;
+                    });
                 });
                 setUsers(list);
                 setLoading(false);

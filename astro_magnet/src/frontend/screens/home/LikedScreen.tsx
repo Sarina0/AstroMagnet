@@ -3,102 +3,114 @@ import {
     View, Image, 
     FlatList, TextInput
 } from 'react-native'
-import {useEffect, useState, useContext} from "react";
-import FastImage from "react-native-fast-image";
+import { useContext, useEffect, useState } from "react";
 import { ColorPalette } from "@app/theme/colors";
 import Images from "@app/theme/images";
-import { UserContext } from "@app/store/user";
-import UserController from "@app/controller/user";
 import EmptyView from "@app/frontend/components/EmptyView";
-import { User } from '@app/shared/interfaces/user';
+import PageHeader from '@app/frontend/components/global/header';
 import LoadingOverlay from '@app/frontend/components/LoadingOverlay';
+import SafeArea from '@app/frontend/components/global/safeArea';
+import useLiked from '@app/hooks/useLiked';
+import {useToast} from "native-base";
+import ToastDialog from '@app/frontend/components/global/toast';
+import type { User } from "@app/shared/interfaces/user";
+import FriendCard from '@app/frontend/components/friendCard';
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "@app/frontend/navigation/main";
+import { createRoom } from "@app/controller/message";
+import {UserContext} from "@app/context/user";
+
+type NavigationProps = NativeStackNavigationProp<RootStackParamList, "Like">;
 
 const LikedScreen = () => {
-    const [users, setUsers] = useState<any>([]);
-    const [filteredUsers, setFilteredUsers] = useState<any>([]);
-    const [loading, setLoading] = useState(false);
-    const [keyword, setKeyword] = useState('');
-
-    const {profile: currentUser} = useContext(UserContext) as {
-        profile: User
-    }
-
-    const loadLikeUsers = async () => {
-        setLoading(true);
-        const {data: _users} = await UserController.getAllUsers();
-        const likeUsers = [];
-        for (const user of _users) {
-            const userId = user._ref._documentPath._parts[1];
-            if (userId !== currentUser.id) {
-                const like = currentUser.liked || [];
-                const dislike = currentUser.disliked || [];
-                const likeIndex = like.indexOf(userId);
-                if (likeIndex >= 0) {
-                    likeUsers.push({
-                        ...user._data,
-                        userId
-                    });
-                }
-            }
+    const {profile} = useContext(UserContext)
+    const toast = useToast();
+    const navigation = useNavigation<NavigationProps>();
+    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+    const {likedUsers, loading} = useLiked(
+        (error) => {
+            toast.show({
+                render: () => <ToastDialog message={error} />
+            })
         }
-        setUsers(likeUsers);
-        setFilteredUsers(likeUsers);
-    }
+    );
+    const [keyword, setKeyword] = useState('');
 
     const onSearchUser = (text: string) => {
         setKeyword(text);
-        if (text) {
-            const filtered = users.filter((item: User) => item.name!.indexOf(text) >= 0);
-            setFilteredUsers(filtered);
-        } else {
-            setFilteredUsers(users);
-        }
     }
 
-    useEffect(() => {
-        (async () => {
-            setLoading(true);
-            await loadLikeUsers();
-            setLoading(false);
-        })();
-    }, []);
+    const onCardClick = async (user: User) =>  {
+        if (!profile) return;
+        const roomId = await createRoom(profile, user, (error) => {
+            toast.show({
+                render: () => <ToastDialog message={error} />
+            })
+        });
+        navigation.navigate("Chat", {
+            screen: "room",
+            params: {
+                id: roomId,
+                name: user.name!,
+                profilePic: user.profilePicture!
+            }
+        });
+    }
+
+    useEffect(()=> {
+        if (keyword) {
+            const filtered: User[] = likedUsers.filter((user: User) => {
+                return user.name?.toLowerCase().includes(keyword.toLowerCase());
+            });
+            setFilteredUsers(filtered);
+        } else {
+            setFilteredUsers(likedUsers);
+        }
+
+        if (likedUsers.length === 0) {
+            setFilteredUsers([]);
+        }
+    }, [likedUsers, keyword]);
 
     return (
-        <View style={styles.container}>
-            <View style={styles.searchWrapper} className="bg-secondary">
-                <Image style={styles.searchIcon} source={Images.icon_search} />
-                <TextInput
-                    style={styles.searchText}
-                    className="text-onSecondary"
-                    placeholder={'Search'}
-                    placeholderTextColor={ColorPalette.SOFT_MAGENTA}
-                    value={keyword}
-                    onChangeText = {onSearchUser}
-                />
+        <SafeArea>
+            <PageHeader/>
+            <View style={styles.container}>
+                <View style={styles.searchWrapper} className="bg-secondary">
+                    <Image style={styles.searchIcon} source={Images.icon_search} />
+                    <TextInput
+                        style={styles.searchText}
+                        className="text-onSecondary"
+                        placeholder={'Search'}
+                        placeholderTextColor={ColorPalette.SOFT_MAGENTA}
+                        value={keyword}
+                        onChangeText = {onSearchUser}
+                    />
+                </View>
+                <Text style={styles.bannerText} className="text-onSecondary">Liked People</Text>
+                {filteredUsers && filteredUsers.length > 0 ? (
+                    <FlatList
+                        style={styles.listView}
+                        data={filteredUsers}
+                        keyExtractor={(_item, index) => index.toString()}
+                        ListFooterComponent={() => <View style={{ height: 20 }} />}
+                        renderItem={({ item }) => {
+                            return (
+                                <FriendCard
+                                    profilePicture={item.profilePicture!}
+                                    personName={item.name!}
+                                    onPress={() => onCardClick(item)}
+                                />
+                            );
+                        }}
+                    />
+                ) : (
+                    <EmptyView title={'No liked people.'} />
+                )}
+                {loading && <LoadingOverlay/>}
             </View>
-            <Text style={styles.bannerText} className="text-onSecondary">Liked People</Text>
-            {filteredUsers && filteredUsers.length > 0 ? (
-                <FlatList
-                    style={styles.listView}
-                    data={filteredUsers}
-                    keyExtractor={(item, index) => index.toString()}
-                    ListFooterComponent={() => <View style={{ height: 20 }} />}
-                    renderItem={({ item }) => {
-                        return (
-                            <View style={styles.userCell} className="bg-tertiary">
-                                <FastImage style={styles.avatar} source={item.profilePicture ? {uri: item.profilePicture} : Images.avatar_placeholder} />
-                                <Text className="text-lg text-secondary font-bold ml-5">
-                                    {item.name || ''}
-                                </Text>
-                            </View>
-                        );
-                    }}
-                />
-            ) : (
-                <EmptyView title={'No liked people.'} />
-            )}
-            {loading && <LoadingOverlay/>}
-        </View>
+        </SafeArea>
     )
 }
 
@@ -136,22 +148,5 @@ const styles = StyleSheet.create({
     listView: {
         flex: 1,
     },
-    userCell: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 10,
-        borderRadius: 10,
-        marginBottom: 10
-    },
-    avatar: {
-        width: 60,
-        height: 60,
-        borderRadius: 30
-    },
-    nameText: {
-        marginLeft: 15,
-        fontSize: 18,
-        color: ColorPalette.VIOLET,
-        fontWeight: '600'
-    }
+    
 })
