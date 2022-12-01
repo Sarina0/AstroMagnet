@@ -39,7 +39,7 @@ const ProfileScreen = () => {
         currentUser?.placeOfBirth ?? ""
     )
     const [ updatedPic, setUpdatedPic] = useState<string | null | undefined>(
-        currentUser?.profilePicture ?? undefined
+        undefined
     );
     const [ loading, setLoading ] = useState(false);
     const toast = useToast();

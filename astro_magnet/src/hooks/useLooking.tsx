@@ -31,7 +31,8 @@ export default function useLooking(
                             (friend) => friend.email
                         ).includes(doc.data().email) &&
                         profile.interestedType.includes(doc.data().sex) &&
-                        doc.data().interestedType.includes(profile.sex)
+                        doc.data().interestedType.includes(profile.sex) &&
+                        !doc.data().disliked.includes(profile.id)
                         ) {
                         list.push({
                             id: doc.id,
@@ -56,6 +57,8 @@ export default function useLooking(
         profile?.id,
         profile?.liked,
         profile?.disliked,
+        profile?.interestedType,
+        profile?.messagingFriendList,
     ]);
     return {
 

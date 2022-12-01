@@ -13,7 +13,8 @@ import { FireDoc } from "@app/shared/interfaces/firebase";
  */
 export default function useMessage(
     chatRoomId: string,
-    onError?:(error:string)=>void
+    page?: number,
+    onError?:(error:string)=>void,
 ) {
     const {profile} = useContext(UserContext);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -36,7 +37,10 @@ export default function useMessage(
 
         //get messages from firestore
         const chatRoomRef = firestore().collection("chatRooms").doc(chatRoomId);
-        const messagesRef = chatRoomRef.collection("messages").orderBy("createdAt", "asc");
+        const messagesRef = chatRoomRef
+            .collection("messages")
+            .orderBy("createdAt", "desc")
+            .limit(page ? page * 10 : 10);
         const unsubscribe = messagesRef
             .onSnapshot((snapshot) => {
                 const list: FireDoc[] = [];
@@ -54,7 +58,7 @@ export default function useMessage(
                 onError && onError("Error fetching messages");
             });
         return unsubscribe;
-    }, [chatRoomId, profile]);
+    }, [chatRoomId, profile, page]);
 
     return {
         /** current chat room messages */

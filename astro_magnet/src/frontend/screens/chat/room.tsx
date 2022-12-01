@@ -19,8 +19,10 @@ import { ColorPalette } from "@app/theme/colors";
 export default function Room(props: {route: {params: {id: string}}}) {
     const toast = useToast();
     const listRef = useRef<AutoScrollFlatList<Message>>(null);
+    const [page, setPage] = useState(1);
     const { messages, loading } = useMessage(
         props.route.params.id,
+        page,
         (error) => {
             toast.show({
                 render: () => <ToastDialog message={error} />,
@@ -44,6 +46,15 @@ export default function Room(props: {route: {params: {id: string}}}) {
         )
     }, []);
 
+    //hooks to detect message loaded the first time
+    const [firstLoad, setFirstLoad] = useState(true);
+    useEffect(() => {
+        if (firstLoad && !loading) {
+            setFirstLoad(false);
+        }
+    }, [firstLoad, loading]);
+
+
     //keep track of keyboard height
     const [isKeyboardShow, setIsKeyboardShow] = useState<boolean>(false);
     const keyboardHeight = useKeyboardHeight();
@@ -52,6 +63,13 @@ export default function Room(props: {route: {params: {id: string}}}) {
     useKeyboard((isKeyboardShow) => {
         setIsKeyboardShow(isKeyboardShow);
     })
+
+    function onMessageTopScroll() {
+        if (!firstLoad && !loading) {
+            setPage(page + 1);
+        }
+    }
+
 
     async function onSendMessage() {
         if (!profile) return;
@@ -91,16 +109,11 @@ export default function Room(props: {route: {params: {id: string}}}) {
                         {...item}
                     />
                 }
-                threshold={20}
-                ListHeaderComponent={() => 
-                    <Text color="onSecondary" fontSize="md" textAlign="center" my={2}>
-                        start conversation
-                    </Text>
-                }
                 contentContainerStyle={{
-                    flexGrow: 1,
-                    paddingBottom: isKeyboardShow ? 0 : 10,
+                    flexDirection: "column-reverse",
+                    paddingTop: 10,
                 }}
+                threshold={20}
                 newItemAlertMessage={(newItem) => `New message: +${newItem}`}
                 newItemAlertContainerStyle={{
                     backgroundColor: ColorPalette.DARK_VIOLET_2,
@@ -122,9 +135,10 @@ export default function Room(props: {route: {params: {id: string}}}) {
                 onScroll={(e)=>{
                     //check if top is reached
                     if (e.nativeEvent.contentOffset.y == 0) {
-                        console.log("top reached"); 
+                        onMessageTopScroll();
                     }
                 }}
+                showNewItemAlert={false}
             />
             <Input 
                 value={message}
@@ -132,7 +146,7 @@ export default function Room(props: {route: {params: {id: string}}}) {
                 placeholder="Type a message"
                 onSend={onSendMessage}
                 style={{
-                    marginBottom: isKeyboardShow? keyboardHeight + 1 : 5,
+                    marginBottom: isKeyboardShow? keyboardHeight + 0.5 : 5,
                     paddingHorizontal: isKeyboardShow? 0 : 10,
                     borderRadius: isKeyboardShow? 0 : 10,
                     width: "100%",

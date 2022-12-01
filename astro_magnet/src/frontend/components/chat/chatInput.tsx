@@ -23,7 +23,6 @@ export default function InputComponent(props: Props) {
         <Box
             alignItems="center"
             flexDirection="row"
-            borderRadius={10}
             overflow="hidden"
             style={props.style}
         >
