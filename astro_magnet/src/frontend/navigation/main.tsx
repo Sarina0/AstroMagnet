@@ -55,7 +55,6 @@ export default function MainNavigation() {
                                             size={26} 
                                         />
                                     ),
-                                    
                                 }}
                                 component={ChatScreen}
                             />

@@ -1,11 +1,13 @@
 import { Input, Icon, Box } from "native-base";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { ViewStyle } from "react-native";
 
 interface Props {
     value: string;
     onChangeText: (text: string) => void;
     placeholder: string;
     onSend: () => void;
+    style?: ViewStyle;
 }
 
 /**
@@ -19,10 +21,11 @@ interface Props {
 export default function InputComponent(props: Props) {
     return (
         <Box
-            paddingX={4}
             alignItems="center"
             flexDirection="row"
-            
+            borderRadius={10}
+            overflow="hidden"
+            style={props.style}
         >
             <Input
                 bgColor="onSecondary"
@@ -31,8 +34,8 @@ export default function InputComponent(props: Props) {
                 placeholderTextColor="indigo.900"
                 onChangeText={props.onChangeText}
                 value={props.value}
-                borderRadius={10}
                 fontSize={18}
+                width="full"
                 InputRightElement={
                     <Icon
                         as={<MaterialCommunityIcons name="send" />}

@@ -1,7 +1,7 @@
-import { Text, useToast, Box, Fab, ArrowDownIcon} from "native-base";
+import { Text, useToast, Box, Fab, ArrowDownIcon } from "native-base";
 import {useContext, useEffect, useState, useRef } from "react";
 import { MenuContext } from "@app/context/menu";
-import SafeArea from "@app/frontend/components/global/safeArea";
+import { SafeAreaView } from "react-native";
 import useMessage from "@app/hooks/useMessage";
 import ToastDialog from '@app/frontend/components/global/toast';
 import Input from "@app/frontend/components/chat/chatInput";
@@ -80,7 +80,7 @@ export default function Room(props: {route: {params: {id: string}}}) {
     }
 
     return (
-        <SafeArea>
+        <SafeAreaView className="flex-1">
             {loading && <LoadingOverlay/>}
             <AutoScrollFlatList
                 data={messages}
@@ -119,20 +119,26 @@ export default function Room(props: {route: {params: {id: string}}}) {
                         onPress={()=>listRef.current?.scrollToEnd()}
                     />
                 }
-                onMagicTap={() => listRef.current?.scrollToEnd()}
+                onScroll={(e)=>{
+                    //check if top is reached
+                    if (e.nativeEvent.contentOffset.y == 0) {
+                        console.log("top reached"); 
+                    }
+                }}
             />
             <Input 
                 value={message}
                 onChangeText={setMessage}
                 placeholder="Type a message"
                 onSend={onSendMessage}
-            />
-            <Box
                 style={{
-                    height: isKeyboardShow ? keyboardHeight + 1: 5,
+                    marginBottom: isKeyboardShow? keyboardHeight + 1 : 5,
+                    paddingHorizontal: isKeyboardShow? 0 : 10,
+                    borderRadius: isKeyboardShow? 0 : 10,
+                    width: "100%",
                 }}
             />
-        </SafeArea>
+        </SafeAreaView>
     )
 }
 
