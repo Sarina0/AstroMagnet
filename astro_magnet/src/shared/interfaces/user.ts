@@ -44,10 +44,7 @@ export interface User {
 export interface Friend {
     email: string;
     name: string;
-    profilePicture: string;
-    lastMessageSentBy: string;
-    lastMessageSentDate: Date;
-    chatroomId: string;
+    chatRoomId: string;
 }
 
 export namespace User {

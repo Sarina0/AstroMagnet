@@ -15,19 +15,31 @@ export class UploadController {
      * upload image to firebase storage
      * @returns returns user info
      */
-    static async uploadImage(image: {uri: string}): Promise<string> {
-        let fileName = '';
+    static async uploadImage(image: {
+        uri: string
+        name?: string
+    }): Promise<string> {
+
+        //get image name
+        let fileName = image.name;
+
+        //get image uri
         let fileUri = image.uri;
 
-        let randomText = '';
-        var characters =
-            'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        var charactersLength = characters.length;
-        for (var i = 0; i < 20; i++) {
-            randomText += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
+        //if image name is not provided
+        if (!fileName) {
 
-        fileName = randomText + '.jpg';
+            //generate random image name
+            let randomText = '';
+            var characters =
+                'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            var charactersLength = characters.length;
+            for (var i = 0; i < 20; i++) {
+                randomText += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            fileName = randomText + '.jpg';
+        }
+        
 
         if (Platform.OS === 'ios') {
             if (fileUri.indexOf('file://') === 0) {
@@ -38,7 +50,7 @@ export class UploadController {
                 fileUri = 'file://' + fileUri;
             }
         }
-        console.log('upload file ======>', fileName, fileUri);
+
         const eventReference = storage().ref(fileName);
         await eventReference.putFile(fileUri);
         const uploadedImage = await storage()
@@ -51,3 +63,4 @@ export class UploadController {
         return uploadedImage;
     }
 }
+

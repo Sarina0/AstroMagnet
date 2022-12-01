@@ -2,7 +2,6 @@ import {useState, useEffect} from "react";
 import firestore from "@react-native-firebase/firestore";
 import useAuthState from "./useAuthState";
 import { User } from "@app/shared/interfaces/user";
-import { FirebaseAuthTypes } from "@react-native-firebase/auth";
 
 /**
  * hooks to setup user profile after user has logged in
@@ -13,17 +12,18 @@ import { FirebaseAuthTypes } from "@react-native-firebase/auth";
  * @return {User|null} userProfile - user profile
  * @return {boolean} profileLoading - loading status of user profile(true-false)
  */
-export default function useUserData(
+export default function useProfile(
     onError?: (error: string) => void,
 ) {
     const {user, status} = useAuthState();
     const [userProfile, setUserProfile] = useState<User|null>(null);
-    const [profileLoading, setProfileLoading] = useState<boolean>(false);
+    const [profileLoading, setProfileLoading] = useState<boolean>(true);
 
     useEffect(() => {
         if (status==="loading") return;
         if (user) {
             setProfileLoading(true);
+            console.log("[LOG] profile loading");
             const unsubscribe = firestore()
                 .collection('users')
                 .where("email", "==", user.email)
@@ -42,19 +42,25 @@ export default function useUserData(
                         } as User);
                         setProfileLoading(false);
                     } else {
+
                         //if profile does not exist, set the profile to null
                         setUserProfile(null);
                         setProfileLoading(false);
+                        console.log("[LOG] user profile does not exist")
                     }
                 }, (error)=> {
+                    setProfileLoading(false);
                     onError && onError("Error fetching user profile");
                     console.log("[LOG] error fetching user profile:", error);
                 })
 
             //unsubscribe on view unmount
             return unsubscribe;
+        } else {
+            setProfileLoading(false);
+            console.log("[LOG] user not logged in")
         }
-    }, [user]);
+    }, [user, status]);
     
     return {
         user,

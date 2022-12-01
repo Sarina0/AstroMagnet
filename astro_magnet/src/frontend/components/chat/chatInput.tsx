@@ -1,20 +1,31 @@
 import { Input, Icon, Box } from "native-base";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { ViewStyle } from "react-native";
 
 interface Props {
     value: string;
     onChangeText: (text: string) => void;
     placeholder: string;
     onSend: () => void;
+    style?: ViewStyle;
 }
 
+/**
+ * input component for chat
+ * @prop value - value of the input
+ * @prop onChangeText - function to be called when the input changes
+ * @prop placeholder - placeholder text
+ * @prop onSend - function to be called when the send button is pressed
+ * @returns {JSX.Element} input component for chat
+ */
 export default function InputComponent(props: Props) {
     return (
         <Box
-            safeArea
-            p={2}
             alignItems="center"
             flexDirection="row"
+            borderRadius={10}
+            overflow="hidden"
+            style={props.style}
         >
             <Input
                 bgColor="onSecondary"
@@ -23,8 +34,8 @@ export default function InputComponent(props: Props) {
                 placeholderTextColor="indigo.900"
                 onChangeText={props.onChangeText}
                 value={props.value}
-                borderRadius={10}
                 fontSize={18}
+                width="full"
                 InputRightElement={
                     <Icon
                         as={<MaterialCommunityIcons name="send" />}
@@ -34,8 +45,8 @@ export default function InputComponent(props: Props) {
                         onPress={props.onSend}
                     />
                 }
+                onSubmitEditing={props.onSend}
             />
         </Box>
-        
     )
 }

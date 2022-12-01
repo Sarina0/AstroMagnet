@@ -127,8 +127,10 @@ export default function SetupScreen() {
             return formData.profilePicture;
         }
         const url = await UploadController
-            .uploadImage({uri: updatedImage})
-            .catch((_error) => {
+            .uploadImage({
+                uri: updatedImage,
+                name: user?.uid,
+            }).catch((_error) => {
                 toast.show({
                     render: () => (
                         <ToastDialog 
