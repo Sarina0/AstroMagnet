@@ -42,6 +42,7 @@ export default function Room(props: {route: {params: {id: string}}}) {
         return (
             () => {
                 setMenuVisible(true);
+                setPage(1);
             }
         )
     }, []);
