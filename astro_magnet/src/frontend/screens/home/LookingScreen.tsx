@@ -14,7 +14,7 @@ import EmptyView from "@app/frontend/components/EmptyView";
 import useLooking from '@app/hooks/useLooking';
 import { FireDoc as doc } from '@app/shared/interfaces/firebase';
 import { getAge } from '@app/shared/actions/time';
-import { useToast } from 'native-base';
+import { ScrollView, useToast } from 'native-base';
 import ToastDialog from '@app/frontend/components/global/toast';
 import SafeArea from '@app/frontend/components/global/safeArea';
 import PageHeader from '@app/frontend/components/global/header';
@@ -150,7 +150,7 @@ const LookingScreen = () => {
     return (
         <SafeArea>
             <PageHeader/>
-            <View style={styles.container}>
+            <ScrollView style={styles.container}>
                 {activeUser ? (
                     <View style={styles.userContainer}>
                         <View style={styles.selectorWrapper}>
@@ -180,7 +180,7 @@ const LookingScreen = () => {
                     </View>
                 ) : <EmptyView title={'No looking people'} />}
                 {loading && <LoadingOverlay />}
-            </View>
+            </ScrollView>
         </SafeArea>   
     )
 }
