@@ -24,7 +24,7 @@ export default function SwipeableCard({ item, removeCard, swipedDirection }: Pro
   let dislikeOpacity = new Animated.Value(-SCREEN_WIDTH);
   
   let rotateCard = xPosition.interpolate({
-    inputRange: [-150, 0, 150],
+    inputRange: [-200, 0, 200],
     outputRange: ['-20deg', '0deg', '20deg'],
   });
 
@@ -35,19 +35,19 @@ export default function SwipeableCard({ item, removeCard, swipedDirection }: Pro
     onMoveShouldSetPanResponderCapture: (evt, gestureState) => true,
     onPanResponderMove: (evt, gestureState) => {
       xPosition.setValue(gestureState.dx);
-      if (gestureState.dx > SCREEN_WIDTH - 350) {
+      if (gestureState.dx > SCREEN_WIDTH - 250) {
         swipeDirection = 'right';
         Animated.parallel([Animated.timing(likeOpacity, {
             toValue: 3,
-            duration: 30,
+            duration: 50,
             useNativeDriver: false,
         }),
         Animated.timing(dislikeOpacity, {
             toValue: -SCREEN_WIDTH,
-            duration: 30,
+            duration: 50,
             useNativeDriver: false,
         })]).start();
-      } else if (gestureState.dx < -SCREEN_WIDTH + 350) {
+      } else if (gestureState.dx < -SCREEN_WIDTH + 250) {
         swipeDirection = 'left';
         Animated.parallel([
         Animated.timing(likeOpacity, {
@@ -64,8 +64,8 @@ export default function SwipeableCard({ item, removeCard, swipedDirection }: Pro
     },
     onPanResponderRelease: (evt, gestureState) => {
       if (
-        gestureState.dx < SCREEN_WIDTH - 125 &&
-        gestureState.dx > -SCREEN_WIDTH + 125
+        gestureState.dx < SCREEN_WIDTH - 150 &&
+        gestureState.dx > -SCREEN_WIDTH + 150
       ) {
         swipedDirection('--');
         Animated.parallel([
@@ -86,32 +86,32 @@ export default function SwipeableCard({ item, removeCard, swipedDirection }: Pro
             useNativeDriver: false,
         })
         ]).start();
-      } else if (gestureState.dx > SCREEN_WIDTH - 125) {
+      } else if (gestureState.dx > SCREEN_WIDTH - 150) {
         Animated.parallel([
             Animated.timing(xPosition, {
                 toValue: SCREEN_WIDTH,
-                duration: 20,
+                duration: 150,
                 useNativeDriver: false,
             }),
             Animated.timing(cardOpacity, {
                 toValue: 0,
-                duration: 20,
+                duration: 150,
                 useNativeDriver: false,
             }),
         ]).start(() => {
           swipedDirection(swipeDirection);
           removeCard && removeCard();
         });
-      } else if (gestureState.dx < -SCREEN_WIDTH + 125) {
+      } else if (gestureState.dx < -SCREEN_WIDTH + 150) {
         Animated.parallel([
             Animated.timing(xPosition, {
                 toValue: -SCREEN_WIDTH,
-                duration: 20,
+                duration: 200,
                 useNativeDriver: false,
             }),
             Animated.timing(cardOpacity, {
                 toValue: 0,
-                duration: 20,
+                duration: 200,
                 useNativeDriver: false,
             }),
         ]).start(() => {
