@@ -17,6 +17,10 @@ import type { User } from "@app/shared/interfaces/user";
 import FriendCard from '@app/frontend/components/global/friendCard';
 import Title from "@app/frontend/components/global/title";
 
+/**
+ * screen to display all users that user liked
+ * @returns {JSX.Element} liked screen
+ */
 const LikedScreen = () => {
     const toast = useToast();
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);

@@ -5,6 +5,10 @@ import Title from "@app/frontend/components/global/title";
 import RoomList from "@app/frontend/components/chat/roomList";
 import FriendList from "@app/frontend/components/chat/friendList";
 
+/**
+ * screen to display list of user's chat rooms and friends
+ * @returns {JSX.Element} chat rooms screen
+ */
 export default function ChatScreen() {
   return (
     <SafeArea>

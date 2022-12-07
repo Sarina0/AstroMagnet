@@ -7,6 +7,12 @@ interface Props {
     style: Animated.WithAnimatedValue<ViewStyle>;
 }
 
+/**
+ * action button(label) to show when user swipe card(left->dislike, right->like)
+ * @prop {"like"|"dislike"} variant - of action button
+ * @prop {Animated.WithAnimatedValue<ViewStyle>} style - animated style of action button when user swipe card
+ * @returns {JSX.Element} action button
+ */
 export default function ActionButton(props: Props) {
     const screenHeight = Dimensions.get("screen").height;
     return (

@@ -16,6 +16,10 @@ import useKeyboardHeight from "@app/hooks/useKeyboardHeight";
 import useKeyboard from "@app/hooks/useKeyboard";
 import { ColorPalette } from "@app/theme/colors";
 
+/**
+ * screen to display a specific chat room
+ * @returns {JSX.Element} - chat room screen
+ */
 export default function Room(props: {route: {params: {id: string}}}) {
     const toast = useToast();
     const listRef = useRef<AutoScrollFlatList<Message>>(null);

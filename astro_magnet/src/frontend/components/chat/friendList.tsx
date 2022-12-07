@@ -13,6 +13,10 @@ import { getFirstName } from '@app/shared/actions/string';
 
 type NavigationProps = NativeStackNavigationProp<ChatStackParamList, "rooms">;
 
+/**
+ * display current user's friend list (all matched users)
+ * @returns {JSX.Element | null} friend list component
+ */
 export default function FriendList() {
     const { profile } = useContext(UserContext);
     const navigation = useNavigation<NavigationProps>();

@@ -1,16 +1,31 @@
 import moment from "moment";
 
+/**
+ * get user age from date of birth
+ * @param date - user date of birth
+ * @returns {number} - user age
+ */
 export const getAge = (date: Date) => {
     const birthYear = date.getFullYear();
     const curYear= new Date().getFullYear();
     return curYear - birthYear;
 }
 
+/**
+ * format date time to string (YYYY-MMM-DD HH:mm:ss)
+ * @param date - date time to format
+ * @returns {string} - formatted date
+ */
 export const formatDateTime = (date: Date): string => {
     if (!date) return "";
     return moment(date).format("YYYY-MMM-DD HH:mm:ss");
 }
 
+/**
+ * format date time to display in chat bubble
+ * @param date - date time to format
+ * @returns {string} - formatted date
+ */
 export const formatChatTime = (date: Date): string => {
 
     //format date today
@@ -27,6 +42,11 @@ export const formatChatTime = (date: Date): string => {
     return moment(date).format("YYYY/MM/DD HH:mm:ss");
 }
 
+/**
+ * get user astrological sign from date of birth
+ * @param date - user date of birth
+ * @returns {string} - user astrological sign
+ */
 export const getAstrologicalSign = (date: Date): string => {
     if (!date) return "";
     const month = date.getMonth();

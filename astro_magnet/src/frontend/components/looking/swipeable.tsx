@@ -16,6 +16,14 @@ interface Props {
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
+/**
+ * swipeable card component to display users in looking page
+ * @prop {User} item - user to display
+ * @prop {()=>void | undefinded} removeCard - remove card callback
+ * @prop {(direction: string)=>void} swipedDirection - direction of swipe callback (takes in direction(left or right) as parameter)
+ * @returns {JSX.Element} swipeable card component
+ * @see https://snack.expo.dev/embedded/@aboutreact/tinder-like-swipeable-card-example?preview=true&platform=ios&iframeId=0kofaqg0vl&theme=dark
+ */
 export default function SwipeableCard({ item, removeCard, swipedDirection }: Props) {
   const [xPosition, setXPosition] = useState(new Animated.Value(0));
   let swipeDirection = '';

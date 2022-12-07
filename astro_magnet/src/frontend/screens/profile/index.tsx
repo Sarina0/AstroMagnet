@@ -18,6 +18,10 @@ import { validateUser } from '@app/shared/actions/validation';
 import ToastDialog from '@app/frontend/components/global/toast';
 import { useToast } from 'native-base';
 
+/**
+ * user profile screen where user can update his/her profile
+ * @returns {JSX.Element} profile screen
+ */
 const ProfileScreen = () => {
     const {
         profile: currentUser,

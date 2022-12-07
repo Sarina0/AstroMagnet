@@ -1,3 +1,8 @@
+/**
+ * get material community icon name for user's zodiac sign
+ * @param sign - user's zodiac sign
+ * @returns {string} - material community icon name
+ */
 export function getAstroIconName(sign: string) {
     let name="zodiac-"
     switch (sign) {

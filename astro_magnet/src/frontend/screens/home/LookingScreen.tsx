@@ -18,6 +18,10 @@ import Card from "@app/frontend/components/looking/swipeable";
 import ModalDialog from '@app/frontend/components/global/modal';
 import type {User} from "@app/shared/interfaces/user";
 
+/**
+ * screen for looking for new friends
+ * @returns {JSX.Element} looking screen
+ */
 const LookingScreen = () => {
     const toast = useToast();
     const { profile } = useContext(UserContext);

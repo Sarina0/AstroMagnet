@@ -10,13 +10,22 @@ import { getCompatibility } from "@app/shared/actions/compatility";
 import { useContext } from "react";
 import { UserContext } from "@app/context/user";
 
+/**
+ * card component to use inside swipeable card component to display user
+ * @prop {User} item - user to display
+ * @returns {JSX.Element} card component
+ */
 export default function Card({ item }: { item: User }) {
+
+    //get zodiac sign from user date of birth
     const iconName = getAstroIconName(
         getAstrologicalSign(item.dateAndTimeOfBirth!)
     );
 
+    //get user age from date of birth
     const age = getAge(item.dateAndTimeOfBirth!);
 
+    //get first name from user name
     const firstName = getFirstName(item.name!);
 
     const { profile } = useContext(UserContext);

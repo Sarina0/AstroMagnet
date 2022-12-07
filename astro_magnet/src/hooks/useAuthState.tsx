@@ -3,6 +3,10 @@ import auth, { FirebaseAuthTypes } from "@react-native-firebase/auth";
 
 type status = "authenticated" | "unauthenticated" | "loading";
 
+/**
+ * hooks to keep track of user authentication state
+ * @returns {user: FirebaseAuthTypes.User|null, status: status} - authenticated user and authentication status
+ */
 export default function useAuthState() {
 
     /**authenticated user*/

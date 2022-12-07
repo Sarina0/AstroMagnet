@@ -4,6 +4,12 @@ const toRad = (Value:any) => {
     return (Value * Math.PI) / 180;
 };
 
+/**
+ * find compatibility percentage of two users
+ * @param user1 - first user
+ * @param user2 - second user
+ * @returns {number} - compatibility percentage of two users
+ */
 export const getCompatibility = (user1: User, user2: User) => {
     if (user1 && user2) {
         let lat1 = user1.lat!;
