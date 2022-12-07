@@ -12,7 +12,7 @@ export enum ColorPalette {
     /**
      * #E4B7E5
      */
-    SOFT_MAGENTA = "#E4B7E5",
+    SOFT_MAGENTA = "#FEE1FF",
     /**
      * #B288C0
      */

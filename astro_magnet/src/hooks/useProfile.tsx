@@ -23,7 +23,6 @@ export default function useProfile(
         if (status==="loading") return;
         if (user) {
             setProfileLoading(true);
-            console.log("[LOG] profile loading");
             const unsubscribe = firestore()
                 .collection('users')
                 .where("email", "==", user.email)
@@ -58,7 +57,6 @@ export default function useProfile(
             return unsubscribe;
         } else {
             setProfileLoading(false);
-            console.log("[LOG] user not logged in")
         }
     }, [user, status]);
     

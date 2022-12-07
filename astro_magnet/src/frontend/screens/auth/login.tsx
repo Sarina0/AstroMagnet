@@ -1,4 +1,3 @@
-import { StyleSheet } from 'react-native';
 import RegistrationHeader from '@app/frontend/components/auth/header'
 import SignInButton from '@app/frontend/components/auth/signInButton';
 import SafeArea from '@app/frontend/components/global/safeArea';

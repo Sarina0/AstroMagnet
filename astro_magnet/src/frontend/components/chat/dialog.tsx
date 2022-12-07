@@ -3,7 +3,7 @@ import type { Message } from "@app/shared/interfaces/message";
 import { useContext } from "react";
 import { UserContext } from "@app/context/user";
 import { formatChatTime } from "@app/shared/actions/time";
-import Image from "../global/image";
+import Avatar from "../global/avatar";
 
 /**
  * Chat box component
@@ -23,21 +23,12 @@ export default function Dialog(props: Message) {
             alignItems={"center"}
         >
             <Box 
-                width={50}
-                height={50}
-                rounded="full"
-                overflow="hidden"
                 mr={isCurrentUser ? 2 : 3}
                 ml={isCurrentUser ? 3 : 2}
-                alignSelf={"flex-start"}
             >
-                <Image
+                <Avatar
                     src={sendBy.profilePicture}
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                    }}
-                    resizeMode="cover"
+                    size="sm"
                 />
             </Box>
             <Box

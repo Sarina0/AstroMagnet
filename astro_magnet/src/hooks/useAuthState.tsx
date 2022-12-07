@@ -13,13 +13,10 @@ export default function useAuthState() {
 
     // Handle user state changes
     function onAuthStateChanged(user: FirebaseAuthTypes.User|null) {
-      console.log("[LOG] user state changed");
       if (user) {
-        console.log("[LOG] user authenticated");
         setUser(user);
         setStatus("authenticated");
       } else {
-        console.log("[LOG] user unauthenticated");
         setUser(null);
         setStatus("unauthenticated");
       }

@@ -4,6 +4,11 @@ import { FireDoc } from "@app/shared/interfaces/firebase";
 import type { ChatRoom } from "@app/shared/interfaces/message";
 import {UserContext} from "@app/context/user";
 
+/**
+ * hooks to fetch user's chatrooms
+ * @param {(error: string)=>void | undefined} onError - callback function to handle network error
+ * @returns {channels: ChatRoom[], loading: boolean} - a list of chatrooms and loading state
+ */
 export default function useChatChannels(
     onError?: (error: string) => void
 ) {
