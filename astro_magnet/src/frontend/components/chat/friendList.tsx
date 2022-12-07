@@ -1,4 +1,4 @@
-import { FlatList, useToast, Box } from "native-base";
+import { FlatList, useToast, Box, Text } from "native-base";
 import Avatar from "../global/avatar";
 import {createRoom} from "@app/controller/message";
 import EmptyView from "@app/frontend/components/EmptyView";
@@ -9,6 +9,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ChatStackParamList } from '@app/frontend/navigation/chat';
 import ToastDialog from "../global/toast";
 import type {Friend} from "@app/shared/interfaces/user";
+import { getFirstName } from '@app/shared/actions/string';
 
 type NavigationProps = NativeStackNavigationProp<ChatStackParamList, "rooms">;
 
@@ -51,6 +52,15 @@ export default function FriendList() {
                       src={item.profilePicture}
                       onPress={() => onNavigateChat(item)}
                     />
+                    <Text
+                        fontSize="sm"
+                        textAlign="center"
+                        color="white"
+                        fontWeight="bold"
+                        mt={3}
+                    >
+                        {getFirstName(item.name)}
+                    </Text>
                   </Box>
                 )}
                 keyExtractor={(item) => item.id}

@@ -14,7 +14,7 @@ export default function ChatScreen() {
           <FriendList/>
         </Box>
         <Box flex={1}>
-          <Title title="Messages" />
+          <Title title="Messages" mt={1}/>
           <RoomList/>
         </Box>
     </SafeArea>    
