@@ -35,6 +35,7 @@ const LookingScreen = () => {
     useEffect(()=> {
         if (!loading) {
             setActiveUser(users[users.length - 1]);
+            count.current = users.length - 1;
         }
     }, [loading])
 
@@ -92,7 +93,15 @@ const LookingScreen = () => {
     const onDislike = async () => {
         if (activeUser) {
             setIsUpdating(true);
-            await UserController.dislikeUser(profile?.id!, activeUser.id);
+            await UserController.dislikeUser(
+                profile?.id!, 
+                activeUser.id,
+                (message: string) => {
+                    toast.show({
+                        render: () => <ToastDialog message={message} />
+                    });
+                } 
+            );
         }
     }
 
@@ -139,71 +148,42 @@ const LookingScreen = () => {
     return (
         <SafeArea>
             <PageHeader/>
-            <View style={styles.container}>
+            <View className="flex-1 px-2">
                 <ModalDialog
                     isOpen={isMatchedFound}
                     onClose={()=> setIsMatchedFound(false)}
                     message="You have found a match!"
                 />
-                {activeUser ? (
-                    <View style={styles.userContainer}>
-                        <View style={styles.compatibilityWrapper}>
-                            <Text style={styles.compatibilityText}>
-                                Compatibility: {getCompatibility(activeUser)}%
-                            </Text>
-                        </View>
-                        <View className="flex-1">
-                            {users.length > 0 && 
-                                users.map((userDoc, index) => {
-                                    const user = {
-                                        ...userDoc,
-                                        dateAndTimeOfBirth: userDoc.dateAndTimeOfBirth.toDate()
-                                    } as User;
-                                    return (
-                                        <Card
-                                            key={index}
-                                            item={user}
-                                            swipedDirection={(swipedDirection: string)=> {
-                                                if (swipedDirection === 'left') {
-                                                    onDislike();
-                                                } else if (swipedDirection === 'right') {
-                                                    onLike();
-                                                }
-                                            }}
-                                        />
-                                    )
-                                }
-                            )}
-                        </View>  
-                    </View>
-                ) : <EmptyView title="No looking people" />}
-                {loading && <LoadingOverlay />}
+                <View className="flex-1">
+                    {users.length > 0 && 
+                        users.map((userDoc, index) => {
+                            const user = {
+                                ...userDoc,
+                                dateAndTimeOfBirth: userDoc.dateAndTimeOfBirth.toDate()
+                            } as User;
+                            return (
+                                <Card
+                                    key={index}
+                                    item={user}
+                                    swipedDirection={(swipedDirection: string)=> {
+                                        if (swipedDirection === 'left') {
+                                            onDislike();
+                                        } else if (swipedDirection === 'right') {
+                                            onLike();
+                                        }
+                                    }}
+                                />
+                            )
+                        }
+                    )}
+                    {users.length === 0 && <EmptyView title="No looking people" />}
+                </View>  
             </View>
         </SafeArea>   
     )
 }
 
 export default LookingScreen;
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        paddingHorizontal: 15,
-    },
-    userContainer: {
-        flex: 1
-    },
-    compatibilityWrapper: {
-        alignItems: 'flex-end',
-        marginTop: 20,
-        marginBottom: 10
-    },
-    compatibilityText: {
-        fontSize: 24,
-        color: ColorPalette.SOFT_MAGENTA
-    }
-})
-
 //fetch and listen to users changes
 
 

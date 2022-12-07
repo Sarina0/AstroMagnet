@@ -6,6 +6,10 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { getFirstName } from "@app/shared/actions/string";
 import { getAstroIconName } from "@app/shared/actions/icon";
 import type { User } from "@app/shared/interfaces/user";
+import { getCompatibility } from "@app/shared/actions/compatility";
+import { useContext } from "react";
+import { UserContext } from "@app/context/user";
+
 export default function Card({ item }: { item: User }) {
     const iconName = getAstroIconName(
         getAstrologicalSign(item.dateAndTimeOfBirth!)
@@ -15,12 +19,14 @@ export default function Card({ item }: { item: User }) {
 
     const firstName = getFirstName(item.name!);
 
+    const { profile } = useContext(UserContext);
+
     return (
         <Box 
             flex={1}
             width="100%"
             height="100%"
-            borderRadius={30}
+            rounded={30}
             overflow="hidden"
         >
             <Image
@@ -40,39 +46,54 @@ export default function Card({ item }: { item: User }) {
                 overflow={"hidden"}
                 flex={1}
                 width="100%"
+                flexDirection="row"
+                alignItems="center"
             >
                 <Box
-                    flexDirection="row"
-                    alignItems="center"
+                    flex={1}
                 >
-                    <Text
-                        fontSize="xl"
-                        fontWeight="bold"
-                        color="white"
-                        mr={2}
+                    <Box
+                        flexDirection="row"
+                        alignItems="center"
                     >
-                        {firstName}.
-                    </Text>
+                        <Text
+                            fontSize="xl"
+                            fontWeight="bold"
+                            color="white"
+                            mr={2}
+                        >
+                            {firstName}.
+                        </Text>
+                        <Text
+                            fontSize="xl"
+                            color={"white"}
+                            mr={2}
+                        >
+                            {age}
+                        </Text>
+                        <Icon
+                            color="white"
+                            as={MaterialCommunityIcons}
+                            name={iconName}
+                            size="xl"
+                        />
+                    </Box>
                     <Text
-                        fontSize="xl"
-                        color={"white"}
-                        mr={2}
-                    >
-                        {age}
-                    </Text>
-                    <Icon
+                        fontSize="sm"
                         color="white"
-                        as={MaterialCommunityIcons}
-                        name={iconName}
-                        size="xl"
-                    />
+                    >
+                        Born: {item.placeOfBirth}
+                    </Text>
                 </Box>
-                <Text
-                    fontSize="sm"
-                    color="white"
-                >
-                    Born: {item.placeOfBirth}
-                </Text>
+                <Box flex={1}>
+                    <Text
+                        fontSize="xl"
+                        color="white"
+                        fontWeight={"bold"}
+                    >
+                       compatibility: {getCompatibility(profile!, item)}% 
+                    </Text>
+                </Box>
             </Box>
         </Box>
     )
