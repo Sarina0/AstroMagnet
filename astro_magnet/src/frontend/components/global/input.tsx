@@ -44,7 +44,7 @@ export default function InputComponent(props: Props) {
             { props.label && <Text 
                 color="onSecondary" 
                 mb={2} 
-                fontSize="lg"
+                fontSize="md"
                 fontWeight="bold"
             >
                 {props.label }
@@ -60,7 +60,7 @@ export default function InputComponent(props: Props) {
                 type={props.type??'text'}
                 borderRadius={7}
                 borderColor="transparent"
-                fontSize={18}
+                fontSize="md"
                 fontWeight="bold"
                 isDisabled={props.disabled}
                 _disabled={{

@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import {UserContext} from '@app/context/user';
-import { StyleSheet, View, ScrollView, ViewStyle } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import PageHeader from '@app/frontend/components/global/header'
 import { User } from '@app/shared/interfaces/user'
 import { UploadController } from "@app/controller/upload";
@@ -16,7 +16,7 @@ import ImagePicker from '@app/frontend/components/global/imagePicker';
 import DatePicker from '@app/frontend/components/global/datepicker';
 import { validateUser } from '@app/shared/actions/validation';
 import ToastDialog from '@app/frontend/components/global/toast';
-import { useToast } from 'native-base';
+import { useToast, ScrollView } from 'native-base';
 
 /**
  * user profile screen where user can update his/her profile
@@ -123,7 +123,7 @@ const ProfileScreen = () => {
 
     return (
         <SafeArea>
-            <ScrollView style={{flex: 1}}>
+            <ScrollView flex={1} width="100%">
                 <View
                     style = { styles.container }
                 >
@@ -201,14 +201,14 @@ export default ProfileScreen
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1, 
     },
     form: {
         padding: 10,
-        paddingLeft: 30,
+        paddingHorizontal: 20,
         flexDirection: "column",
     },
     extraStyle: {
-        marginTop: 20,
+        marginTop: 15,
     }
 })

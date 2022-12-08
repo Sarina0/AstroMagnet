@@ -37,7 +37,7 @@ export default function MultiSelectComponent(props: Props) {
             <Text
                 color="onSecondary"
                 mb={2}
-                fontSize="lg"
+                fontSize="md"
                 fontWeight="bold"
             >
                 {props.label}
@@ -55,7 +55,7 @@ export default function MultiSelectComponent(props: Props) {
                     p={2}
                 >
                     <Text
-                        fontSize={18}
+                        fontSize="md"
                         fontWeight="bold"
                         color={props.value.length>0?"onSecondary":"indigo.900"}
                     >

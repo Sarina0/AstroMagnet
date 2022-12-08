@@ -70,7 +70,7 @@ export default function ImagePickerComponent(props: Props) {
             <Text
                 color="onSecondary"
                 my={2}
-                fontSize="lg"
+                fontSize="md"
                 fontWeight="bold"
                 style={props.labelStyle}
             >
