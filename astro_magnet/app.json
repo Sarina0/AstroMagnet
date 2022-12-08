@@ -4,10 +4,10 @@
     "slug": "astromagnet",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/app_logo.png",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/background.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#9A48D0"
     },
