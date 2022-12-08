@@ -49,8 +49,9 @@ export default function Card({ item }: { item: User }) {
                 }}
             />
             <Box
-                padding={5}
-                backgroundColor="rgba(0,0,0,0.8)"
+                padding={2}
+                paddingX={4}
+                backgroundColor="rgba(0,0,0,0.5)"
                 position="absolute"
                 bottom={0}
                 borderBottomLeftRadius={30}
@@ -63,13 +64,14 @@ export default function Card({ item }: { item: User }) {
             >
                 <Box
                     flex={1}
+                    paddingX={2}
                 >
                     <Box
                         flexDirection="row"
                         alignItems="center"
                     >
                         <Text
-                            fontSize="xl"
+                            fontSize="md"
                             fontWeight="bold"
                             color="white"
                             mr={2}
@@ -77,17 +79,17 @@ export default function Card({ item }: { item: User }) {
                             {firstName}.
                         </Text>
                         <Text
-                            fontSize="xl"
+                            fontSize="md"
                             color={"white"}
                             mr={2}
                         >
                             {age}
                         </Text>
                         <Icon
-                            color="white"
+                            color="yellow.400"
                             as={MaterialCommunityIcons}
                             name={iconName}
-                            size="xl"
+                            size="md"
                         />
                     </Box>
                     <Text
@@ -97,13 +99,25 @@ export default function Card({ item }: { item: User }) {
                         Born: {item.placeOfBirth}
                     </Text>
                 </Box>
-                <Box flex={1}>
+                <Box 
+                    flex={1}
+                    flexDirection="column"
+                >   
                     <Text
-                        fontSize="xl"
+                        fontSize="md"
+                        fontWeight="bold"
                         color="white"
-                        fontWeight={"bold"}
+                        textAlign="center"
                     >
-                       compatibility: {getCompatibility(profile!, item)}% 
+                        compatibility
+                    </Text>
+                    <Text
+                        fontSize="md"
+                        fontWeight="bold"
+                        color="white"
+                        textAlign="center"
+                    >
+                        {getCompatibility(profile!, item)}% 
                     </Text>
                 </Box>
             </Box>

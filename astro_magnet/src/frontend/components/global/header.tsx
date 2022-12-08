@@ -1,6 +1,4 @@
-import { StyleSheet } from 'react-native'
 import React from 'react'
-import { ColorPalette } from '@app/theme/colors';
 import {Box, Text, Image} from "native-base";
 
 /**
@@ -41,7 +39,8 @@ const PageHeader = (props: Props) => {
                 <Text
                     fontWeight="bold"
                     color="tertiary"
-                    fontSize="3xl"
+                    fontSize={30}
+                    textAlign="center"
                 >
                     AstroMagnet
                 </Text>
