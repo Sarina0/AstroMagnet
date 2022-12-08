@@ -1,4 +1,4 @@
-import { FlatList, useToast } from "native-base";
+import { FlatList, useToast, Spinner, Box } from "native-base";
 import ChatCard from "./card";
 import ToastDialog from "../global/toast";
 import type { Friend } from "@app/shared/interfaces/user";
@@ -10,7 +10,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ChatStackParamList } from '@app/frontend/navigation/chat';
 import useChatChannels from "@app/hooks/useChatChannels";
 import {createRoom} from "@app/controller/message";
-import LoadingOverlay from "@app/frontend/components/LoadingOverlay";
 
 type NavigationProps = NativeStackNavigationProp<ChatStackParamList, "rooms">;
 
@@ -48,7 +47,19 @@ export default function ChatRooms() {
     }
     
     if (loading) {
-        return <LoadingOverlay/>
+        return (
+          <Box
+            flex={1}
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Spinner 
+              accessibilityLabel="Loading chat rooms"
+              size="lg"
+              color="onSecondary"
+            />
+          </Box>
+        )
     }
 
     return (

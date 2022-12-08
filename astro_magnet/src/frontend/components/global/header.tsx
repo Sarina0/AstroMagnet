@@ -1,5 +1,6 @@
 import React from 'react'
 import {Box, Text, Image} from "native-base";
+import {Dimensions} from "react-native";
 
 /**
  * props type for PageHeader component
@@ -15,6 +16,8 @@ interface Props {
  * @returns 
  */
 const PageHeader = (props: Props) => {
+    const width=Dimensions.get('window').width;
+    const fontSize = width > 400 ? 25 : width > 300 ? 20 : 15;
     return (
         <Box
             flexDirection="row"
@@ -39,7 +42,7 @@ const PageHeader = (props: Props) => {
                 <Text
                     fontWeight="bold"
                     color="tertiary"
-                    fontSize={30}
+                    fontSize={fontSize}
                     textAlign="center"
                 >
                     AstroMagnet
