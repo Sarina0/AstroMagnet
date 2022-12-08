@@ -44,7 +44,7 @@ export default function InputComponent(props: Props) {
             { props.label && <Text 
                 color="onSecondary" 
                 mb={2} 
-                fontSize={20}
+                fontSize="lg"
                 fontWeight="bold"
             >
                 {props.label }

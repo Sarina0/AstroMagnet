@@ -24,7 +24,7 @@ const TimeText = (props: {
     return (
         <Text
             color="onSecondary"
-            fontSize={18}
+            fontSize="lg"
             fontWeight="bold"
             onPress={props.openPicker}
         >

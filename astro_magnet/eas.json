@@ -3,16 +3,19 @@
     "version": ">= 2.4.0"
   },
   "build": {
-    "development": {
-      "developmentClient": true,
-      "distribution": "internal"
+    "astro_magnet_v1": {
+      "android": {
+        "buildType": "apk"
+      }
     },
-    "preview": {
-      "distribution": "internal"
+    "preview2": {
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
     },
-    "production": {}
-  },
-  "submit": {
+    "preview3": {
+      "developmentClient": true
+    },
     "production": {}
   }
 }

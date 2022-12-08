@@ -8,7 +8,8 @@ const theme = extendTheme({
         primary: "#9A48D0",
         secondary: "#63458A",
         onSecondary: "#FEE1FF",
-        tertiary: "#B288C0"
+        tertiary: "#B288C0",
+        secondaryOpaque: "rgba(99, 69, 138, 0.5)",
     }
 });
 

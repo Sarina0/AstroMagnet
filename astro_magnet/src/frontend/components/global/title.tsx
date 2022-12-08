@@ -13,7 +13,7 @@ interface Props extends React.ComponentPropsWithRef<typeof Text> {
 export default function TitleComponent(props: Props) {
     return (
         <Text
-        fontSize={25}
+        fontSize="xl"
         fontWeight="bold"
         color="onSecondary"
         ml={2} mt={5}

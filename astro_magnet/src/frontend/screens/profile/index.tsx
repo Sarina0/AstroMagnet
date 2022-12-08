@@ -136,7 +136,7 @@ const ProfileScreen = () => {
                             value={updatedPic}
                             onChange={(value)=>setUpdatedPic(value)} 
                             labelStyle={{marginTop: 20}}
-                            style={{marginVertical: 10}}
+                            style={{alignSelf: "center"}}
                             mode="avatar"
                         />
                         <Input

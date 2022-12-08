@@ -70,7 +70,7 @@ export default function ImagePickerComponent(props: Props) {
             <Text
                 color="onSecondary"
                 my={2}
-                fontSize={20}
+                fontSize="lg"
                 fontWeight="bold"
                 style={props.labelStyle}
             >
@@ -83,7 +83,6 @@ export default function ImagePickerComponent(props: Props) {
             style={props.style}
             width={width/2.25}
             height={width/2.25}
-            mx={props.mode === "image" ? 0 : "auto"}
         >
             <Pressable
                 position="absolute"
