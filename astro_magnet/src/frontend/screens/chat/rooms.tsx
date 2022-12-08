@@ -14,7 +14,7 @@ export default function ChatScreen() {
     <SafeArea>
         <PageHeader />
         <Box>
-          <Title title="Matched" mb={5}/>
+          <Title title="Matched" mb={1}/>
           <FriendList/>
         </Box>
         <Box flex={1}>
