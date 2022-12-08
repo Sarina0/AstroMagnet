@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, View, Dimensions, Image, Text } from 'react-native';
-import Images from "../../theme/images";
+import { Text, Icon, Box } from "native-base";
+import {MaterialCommunityIcons} from "@expo/vector-icons";
 
 /**
  * empty view component props type
@@ -19,43 +19,29 @@ const EmptyView = (props: Props) => {
     const { title } = props;
 
     return (
-        <View style={styles.container}>
-            <View style={{alignItems: 'center', justifyContent: 'center'}}>
-                <Image style={styles.sadIcon} source={Images.icon_sad}/>
-                <Text style={styles.textLabel}>{title || ''}</Text>
-            </View>
-        </View>
+        <Box
+            flex={1}
+            justifyContent="center"
+            alignItems="center"
+        >
+            <Icon
+                as={MaterialCommunityIcons}
+                name="emoticon-sad-outline"
+                color="onSecondary"
+                size="3xl"
+                alignSelf="center"
+            />
+            { title &&
+                <Text 
+                    color="onSecondary" 
+                    fontSize="lg"
+                    textAlign="center"
+                >
+                    {title}
+                </Text>
+            }
+        </Box>
     );
 }
 
-export default EmptyView
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        width: '100%',
-        height: '100%',
-        top: 0,
-        alignItems: 'center',
-        justifyContent: 'center'
-    },
-
-    sadIcon: {
-        width: 50,
-        height: 50,
-        resizeMode: 'contain',
-        marginBottom: 10,
-        opacity: 0.7
-    },
-
-    textLabel: {
-        fontSize: 20,
-        color: 'white',
-        opacity: 0.7
-    },
-    placeImage: {
-        width: 20,
-        height: 20,
-        resizeMode: 'contain',
-    },
-});
+export default EmptyView;

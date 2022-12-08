@@ -71,7 +71,15 @@ export default function FriendList() {
                 horizontal
                 showsHorizontalScrollIndicator={false}
               /> 
-            ): <EmptyView title="You have no matched yet" />}
+            ): 
+            <Text
+                color="onSecondary"
+                fontSize="lg"
+                textAlign="center"
+            >
+                You have no matched yet
+            </Text> 
+            }
         </>
     )
 }
