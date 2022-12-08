@@ -1,15 +1,9 @@
-import {
-    StyleSheet, View,
-    Text, Dimensions
-} from 'react-native'
-import { useEffect, useState, useContext, useRef } from "react";
+import { View } from 'react-native'
+import { useState, useContext } from "react";
 import UserController from "@app/controller/user";
-import { ColorPalette } from "@app/theme/colors";
 import {UserContext} from "@app/context/user";
-import LoadingOverlay from "@app/frontend/components/LoadingOverlay";
 import EmptyView from "@app/frontend/components/EmptyView";
 import useLooking from '@app/hooks/useLooking';
-import { FireDoc as doc } from '@app/shared/interfaces/firebase';
 import { useToast } from 'native-base';
 import ToastDialog from '@app/frontend/components/global/toast';
 import SafeArea from '@app/frontend/components/global/safeArea';
@@ -104,6 +98,5 @@ const LookingScreen = () => {
 }
 
 export default LookingScreen;
-//fetch and listen to users changes
 
 
