@@ -28,8 +28,8 @@ export default function SwipeableCard({ item, removeCard, swipedDirection }: Pro
   const [xPosition, setXPosition] = useState(new Animated.Value(0));
   let swipeDirection = '';
   let cardOpacity = new Animated.Value(1);
-  let likeOpacity = new Animated.Value(-SCREEN_WIDTH);
-  let dislikeOpacity = new Animated.Value(-SCREEN_WIDTH);
+  let likePosition = new Animated.Value(-SCREEN_WIDTH);
+  let dislikePosition = new Animated.Value(-SCREEN_WIDTH);
   
   let rotateCard = xPosition.interpolate({
     inputRange: [-200, 0, 200],
@@ -45,12 +45,12 @@ export default function SwipeableCard({ item, removeCard, swipedDirection }: Pro
       xPosition.setValue(gestureState.dx);
       if (gestureState.dx > SCREEN_WIDTH - 250) {
         swipeDirection = 'right';
-        Animated.parallel([Animated.timing(likeOpacity, {
+        Animated.parallel([Animated.timing(likePosition, {
             toValue: 3,
             duration: 50,
             useNativeDriver: false,
         }),
-        Animated.timing(dislikeOpacity, {
+        Animated.timing(dislikePosition, {
             toValue: -SCREEN_WIDTH,
             duration: 50,
             useNativeDriver: false,
@@ -58,12 +58,12 @@ export default function SwipeableCard({ item, removeCard, swipedDirection }: Pro
       } else if (gestureState.dx < -SCREEN_WIDTH + 250) {
         swipeDirection = 'left';
         Animated.parallel([
-        Animated.timing(likeOpacity, {
+        Animated.timing(likePosition, {
             toValue: -SCREEN_WIDTH,
             duration: 30,
             useNativeDriver: false,
         }),
-        Animated.timing(dislikeOpacity, {
+        Animated.timing(dislikePosition, {
             toValue: 3,
             duration: 30,
             useNativeDriver: false,
@@ -83,12 +83,12 @@ export default function SwipeableCard({ item, removeCard, swipedDirection }: Pro
           bounciness: 10,
           useNativeDriver: false,
         }),
-        Animated.timing(likeOpacity, {
+        Animated.timing(likePosition, {
             toValue: -SCREEN_WIDTH,
             duration: 20,
             useNativeDriver: false,
         }),
-        Animated.timing(dislikeOpacity, {
+        Animated.timing(dislikePosition, {
             toValue: -SCREEN_WIDTH,
             duration: 20,
             useNativeDriver: false,
@@ -136,14 +136,14 @@ export default function SwipeableCard({ item, removeCard, swipedDirection }: Pro
         <>
             <ActionButton
                 style={{
-                    right: likeOpacity
+                    right: likePosition
                 }}
                 variant="like"
             />
         
             <ActionButton
                 style={{
-                    left: dislikeOpacity
+                    left: dislikePosition
                 }}
                 variant="dislike"
             />
