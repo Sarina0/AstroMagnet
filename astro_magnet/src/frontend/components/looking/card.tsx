@@ -9,6 +9,7 @@ import type { User } from "@app/shared/interfaces/user";
 import { getCompatibility } from "@app/shared/actions/compatility";
 import { useContext } from "react";
 import { UserContext } from "@app/context/user";
+import { Dimensions } from "react-native";
 
 /**
  * card component to use inside swipeable card component to display user
@@ -16,6 +17,8 @@ import { UserContext } from "@app/context/user";
  * @returns {JSX.Element} card component
  */
 export default function Card({ item }: { item: User }) {
+
+    const width = Dimensions.get("window").width;
 
     //get zodiac sign from user date of birth
     const iconName = getAstroIconName(
@@ -32,11 +35,11 @@ export default function Card({ item }: { item: User }) {
 
     return (
         <Box 
-            flex={1}
             width="100%"
-            height="100%"
+            height="90%"
             rounded={30}
             overflow="hidden"
+            mt={5}
         >
             <Image
                 src={item.profilePicture}
