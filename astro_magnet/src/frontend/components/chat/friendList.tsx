@@ -1,15 +1,16 @@
-import { FlatList, useToast, Box, Text } from "native-base";
+import { FlatList, useToast, Box, Text, Spinner } from "native-base";
 import Avatar from "../global/avatar";
 import {createRoom} from "@app/controller/message";
-import EmptyView from "@app/frontend/components/EmptyView";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@app/context/user";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ChatStackParamList } from '@app/frontend/navigation/chat';
 import ToastDialog from "../global/toast";
-import type {Friend} from "@app/shared/interfaces/user";
+import type { User } from "@app/shared/interfaces/user";
 import { getFirstName } from '@app/shared/actions/string';
+import useFriends from "@app/hooks/useFriends";
+import type { ChatRoom } from "@app/shared/interfaces/message";
 
 type NavigationProps = NativeStackNavigationProp<ChatStackParamList, "rooms">;
 
@@ -21,21 +22,22 @@ export default function FriendList() {
     const { profile } = useContext(UserContext);
     const navigation = useNavigation<NavigationProps>();
     const toast = useToast();
+    const { friends, loading } = useFriends();
 
-    const onNavigateChat = async (friend: Friend) => {
+    const onNavigateChat = async (friend: User) => {
         if (!profile) return;
-        const roomId = await createRoom(
-            profile, friend,
+        const room = await createRoom(
+            profile, { id: friend.id! },
             (error) => {
                 toast.show({
                     render: () => <ToastDialog message={error} />
                 })
             }
         );
+        if (!room) return;
         navigation.push("room", {
-          id: roomId,
-          name: friend.name!,
-          profilePic: friend.profilePicture!
+          channel: room as ChatRoom,
+          name: friend?.name!,
         });
     }
 
@@ -43,17 +45,33 @@ export default function FriendList() {
         return null;
     }
 
+    if (loading) { 
+        return (
+            <Box
+                justifyContent="center"
+                alignItems="center"
+            >
+                <Spinner
+                    accessibilityLabel="Loading your friend list"
+                    color="onSecondary"
+                    width={200}
+                    height={200}
+                />
+            </Box>
+        )
+    }
+
     return (
         <>
             { profile.friendList && profile.friendList.length > 0? (
                 <FlatList
                 padding={2}
-                data={profile?.friendList}
+                data={friends}
                 renderItem={({ item }) => (
                   <Box marginRight={3}>
                     <Avatar
                       size="md"
-                      src={item.profilePicture}
+                      src={item.profilePicture!}
                       onPress={() => onNavigateChat(item)}
                     />
                     <Text
@@ -63,11 +81,11 @@ export default function FriendList() {
                         fontWeight="bold"
                         mt={3}
                     >
-                        {getFirstName(item.name)}
+                        {getFirstName(item.name!)}
                     </Text>
                   </Box>
                 )}
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item) => item.id!}
                 horizontal
                 showsHorizontalScrollIndicator={false}
               /> 

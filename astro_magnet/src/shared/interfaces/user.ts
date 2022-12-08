@@ -41,9 +41,6 @@ export interface User {
  * @property {string} chatroomId of friend and user
  */
 export interface Friend {
-    email: string;
-    name: string,
-    profilePicture: string,
     id: string, 
     chatRoomId?: string
 }

@@ -3,13 +3,13 @@ import { Dispatch, SetStateAction } from "react";
 import { ColorPalette } from "@app/theme/colors";
 import Room from "@app/frontend/screens/chat/room";
 import Rooms from "@app/frontend/screens/chat/rooms";
+import type { ChatRoom } from "@app/shared/interfaces/message";
 
 export type ChatStackParamList = {
     rooms: undefined;
     room: {
-        id: string;
+        channel: ChatRoom,
         name: string;
-        profilePic: string;
     }
 }
 
@@ -45,7 +45,9 @@ export default function ChatNavigation() {
             <Stack.Screen
                 name="room"
                 children={
-                    (props) => <Room {...props} />
+                    ({
+                        route: {params: {channel}}
+                    }) => <Room room={channel} />
                 }
                 options={({ route }) => ({
                     title: route.params.name,

@@ -1,7 +1,7 @@
 import { FlatList, useToast, Spinner, Box } from "native-base";
 import ChatCard from "./card";
 import ToastDialog from "../global/toast";
-import type { Friend } from "@app/shared/interfaces/user";
+import type { User } from "@app/shared/interfaces/user";
 import EmptyView from "@app/frontend/components/EmptyView";
 import { useContext } from "react";
 import { UserContext } from "@app/context/user";
@@ -10,6 +10,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ChatStackParamList } from '@app/frontend/navigation/chat';
 import useChatChannels from "@app/hooks/useChatChannels";
 import {createRoom} from "@app/controller/message";
+import { ChatRoom } from "@app/shared/interfaces/message";
+import useUsers from "@app/hooks/useUsers";
 
 type NavigationProps = NativeStackNavigationProp<ChatStackParamList, "rooms">;
 
@@ -24,6 +26,7 @@ export default function ChatRooms() {
     const { profile } = useContext(UserContext);
     const navigation = useNavigation<NavigationProps>();
     const toast = useToast();
+    
     const { channels, loading} = useChatChannels(
         (error) => {
           toast.show({
@@ -32,13 +35,16 @@ export default function ChatRooms() {
         }
     );
 
-    const onNavigateChat = async (friend: Friend) => {
+    const messageFriendIds = profile?.messagingFriendList?.map((friend) => friend.id!);
+    const {users: friends, loading: loadingFriends} = useUsers(messageFriendIds!);
+
+    const onNavigateChat = async (friend: User) => {
         if (!profile) return;
-        const roomId = await createRoom(profile, friend);
+        const room = await createRoom(profile, {id: friend.id!});
+        if (!room) return;
         navigation.push("room", {
-          id: roomId,
-          name: friend.name!,
-          profilePic: friend.profilePicture!
+          channel: room as ChatRoom,
+          name: friend?.name!,
         });
     }
     
@@ -46,7 +52,7 @@ export default function ChatRooms() {
         return null;
     }
     
-    if (loading) {
+    if (loading || loadingFriends) {
         return (
           <Box
             flex={1}
@@ -67,17 +73,21 @@ export default function ChatRooms() {
             { channels && channels.length > 0? (
                 <FlatList
                 data={channels}
-                renderItem={({ item }) => 
-                  <ChatCard 
-                    room={item} 
-                    currUserId={profile.id!} 
-                    onNavigateChat={
-                      ()=>onNavigateChat(
-                        item
-                          .users
-                          .filter((user) => user.id !== profile.id)[0])
-                    }
-                  />
+                renderItem={({ item }) => {
+                  const friendId = item.users?.find((user) => user.id !== profile?.id)?.id
+                  const friend = friends?.find((friend) => friend.id === friendId);
+                  if (!friend) return null;
+                  return (
+                    <ChatCard 
+                      room={item} 
+                      friend={friend}
+                      onNavigateChat={()=>{
+                        onNavigateChat(friend!);
+                      }}
+                    />
+                  )
+                }
+                  
                 }
                 keyExtractor={(item) => item.id!}
                 p={2} flex={1}

@@ -1,5 +1,6 @@
 import Image from "@app/frontend/components/global/image";
-import {Box, Pressable} from "native-base";
+import {Pressable, useToast} from "native-base";
+import ToastDialog from "@app/frontend/components/global/toast";
 
 interface Props {
     src: string;
@@ -22,6 +23,7 @@ function getSize(size: string) {
 
 export default function Avatar(props: Props) {
     const {src, size} = props;
+    const toast = useToast();
     return (
         <Pressable
             size={getSize(size)}
@@ -35,6 +37,11 @@ export default function Avatar(props: Props) {
                 style={{
                     width: "100%",
                     height: "100%",
+                }}
+                onError={()=>{
+                    toast.show({
+                        render: () => <ToastDialog message={"failed to load image"} />
+                    })
                 }}
                 resizeMode="cover"
             />

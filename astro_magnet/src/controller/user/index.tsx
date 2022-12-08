@@ -139,20 +139,14 @@ export default class UserController {
                 //move liked user to current user friend list
                 batch.update(currentUserRef, {
                     friendList: firestore.FieldValue.arrayUnion({
-                        email: likeUser.data()?.email,
                         id: likeUser.id,
-                        name: likeUser.data()?.name,
-                        profilePicture: likeUser.data()?.profilePicture,
                     }),
                 })
 
                 //move current user to liked user friend list
                 batch.update(likeUserRef, {
                     friendList: firestore.FieldValue.arrayUnion({
-                        email: currentUser.data()?.email,
                         id: currentUser.id,
-                        name: currentUser.data()?.name,
-                        profilePicture: currentUser.data()?.profilePicture,
                     }),
                 });
 
@@ -180,6 +174,26 @@ export default class UserController {
                 onMatched && onMatched();
             }
         }
+    }
+
+    /**
+     * get user by id
+     * @param {string} id - user id
+     * @returns returns user data
+     */
+    static async getUserById(id: string): Promise<User | undefined> {
+        return await firestore()
+            .collection('users')
+            .doc(id)
+            .get()
+            .then((documentSnapshot) => {
+                if (documentSnapshot.exists) {
+                    return {
+                        ...documentSnapshot.data(),
+                        id: documentSnapshot.id,
+                    } as User;
+                }
+            });
     }
 
     /**

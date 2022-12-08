@@ -1,11 +1,5 @@
 import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
-
-export interface ChatUser {
-    id: string;
-    name: string;
-    profilePicture: string;
-    email: string;
-}
+import type { Friend as ChatUser } from "./user";
 
 /**
  * Message type

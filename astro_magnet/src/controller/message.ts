@@ -45,7 +45,6 @@ export async function createRoom(
     friend: Friend,
     onError?: (error: string) => void
     ) {
-
     const chatRoomIdIfExist = await checkIfChatRoomExist(
         currentUsers,
         friend.id!
@@ -53,17 +52,29 @@ export async function createRoom(
 
     //guard against already existing chat room
     if (chatRoomIdIfExist) {
-
+        const chatRoom = await firestore()
+            .collection("chatRooms")
+            .doc(chatRoomIdIfExist)
+            .get()
+            .then((doc) => {
+                if (doc.exists) {
+                    return {
+                        id: doc.id,
+                        ...doc.data(),
+                    }
+                }
+                return null;
+            }).catch((error)=>{
+                console.log("[ERROR] error getting chatroom",error);
+                onError && onError("Error getting chatroom, please try again later");
+            })
         //return the chat room id
-        return chatRoomIdIfExist;
+        return chatRoom;
     }
 
     //create chat user from current user
     const currentChatUser = {
-        id: currentUsers.id,
-        name: currentUsers.name,
-        profilePicture: currentUsers.profilePicture,
-        email: currentUsers.email,
+        id: currentUsers.id
     }
 
     //generate chatroom id
@@ -104,10 +115,7 @@ export async function createRoom(
     //add new chat room to friend user chatrooms
     batch.update(firestore().collection("users").doc(friend.id), {
         messagingFriendList: firestore.FieldValue.arrayUnion({
-            email: currentUsers.email,
-            name: currentUsers.name,
-            profilePicture: currentUsers.profilePicture,
-            id: currentUsers.id,
+            ...currentChatUser,
             chatRoomId: chatRoomId,
         })
     });
@@ -118,5 +126,17 @@ export async function createRoom(
             console.log("[ERROR] error creating chatroom",error);
             onError && onError("Error creating chatroom, please try again later");
         });
-    return chatRoomId;
+    //return the newly created chat room
+    return await chatRoomRef.get().then((doc)=>{
+        if (doc.exists) {
+            return {
+                id: doc.id,
+                ...doc.data(),
+            }
+        }
+        return null;
+    }).catch((error)=>{
+        console.log("[ERROR] error getting chatroom",error);
+        onError && onError("Error getting chatroom, please try again later");
+    })
 }
