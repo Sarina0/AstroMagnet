@@ -1,8 +1,9 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useCallback, useContext } from "react";
 import { UserContext } from "@app/context/user";
 import type { Message } from "@app/shared/interfaces/message";
 import firestore from "@react-native-firebase/firestore";
 import { FireDoc } from "@app/shared/interfaces/firebase";
+import { useFocusEffect } from "@react-navigation/native";
 
 /**
  * hook to fetch all messages of a channel
@@ -19,46 +20,49 @@ export default function useMessage(
     const {profile} = useContext(UserContext);
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    useEffect(() => {
+    
+    useFocusEffect(
+        useCallback(() => {
 
-        //guard against unauthenticated user
-        if (!profile) {
-            setLoading(false); 
-            return 
-        }
+            //guard against unauthenticated user
+            if (!profile) {
+                setLoading(false); 
+                return 
+            }
 
-        //guard against unauthorized access to chatroom(user not in chatroom)
-        const userMessageList = profile.messagingFriendList;
-        const isUserInChatRoom = userMessageList.find((user) => user.chatRoomId === chatRoomId);
-        if (!isUserInChatRoom) {
-            setLoading(false); 
-            return 
-        }
+            //guard against unauthorized access to chatroom(user not in chatroom)
+            const userMessageList = profile.messagingFriendList;
+            const isUserInChatRoom = userMessageList.find((user) => user.chatRoomId === chatRoomId);
+            if (!isUserInChatRoom) {
+                setLoading(false); 
+                return 
+            }
 
-        //get messages from firestore
-        const chatRoomRef = firestore().collection("chatRooms").doc(chatRoomId);
-        const messagesRef = chatRoomRef
-            .collection("messages")
-            .orderBy("createdAt", "desc")
-            .limit(page ? page * 10 : 10);
-        const unsubscribe = messagesRef
-            .onSnapshot((snapshot) => {
-                const list: FireDoc[] = [];
-                snapshot.forEach((doc) => {
-                    list.push({
-                        id: doc.id,
-                        ...doc.data(),
+            //get messages from firestore
+            const chatRoomRef = firestore().collection("chatRooms").doc(chatRoomId);
+            const messagesRef = chatRoomRef
+                .collection("messages")
+                .orderBy("createdAt", "desc")
+                .limit(page ? page * 10 : 10);
+            const unsubscribe = messagesRef
+                .onSnapshot((snapshot) => {
+                    const list: FireDoc[] = [];
+                    snapshot.forEach((doc) => {
+                        list.push({
+                            id: doc.id,
+                            ...doc.data(),
+                        });
                     });
+                    setMessages(list as Message[]);
+                    setLoading(false);
+                }, (error) => {
+                    setLoading(false);
+                    console.log("[ERROR] error fetching messages:", error);
+                    onError && onError("Error fetching messages");
                 });
-                setMessages(list as Message[]);
-                setLoading(false);
-            }, (error) => {
-                setLoading(false);
-                console.log("[ERROR] error fetching messages:", error);
-                onError && onError("Error fetching messages");
-            });
-        return unsubscribe;
-    }, [chatRoomId, profile, page]);
+            return unsubscribe;
+        }, [chatRoomId, profile, page])
+    );
 
     return {
         /** current chat room messages */

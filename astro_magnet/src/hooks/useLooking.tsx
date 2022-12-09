@@ -1,7 +1,8 @@
-import {useEffect, useState, useContext} from "react";
+import {useCallback, useState, useContext} from "react";
 import firestore from "@react-native-firebase/firestore";
 import { FireDoc } from "@app/shared/interfaces/firebase";
 import { UserContext } from "@app/context/user";
+import { useFocusEffect } from "@react-navigation/native";
 
 /**
  * use users hooks, fetch all user from firestore
@@ -17,52 +18,53 @@ export default function useLooking(
     const [loading, setLoading] = useState<boolean>(true);
     const { profile } = useContext(UserContext);
 
-    useEffect(() => {
-        if (!profile) return;
-        const unsubscribe = firestore()
-            .collection("users")
-            .where(firestore.FieldPath.documentId(), "!=", profile.id)
-            .onSnapshot((querySnapshot) => {
-                const list: FireDoc[] = [];
-                querySnapshot.forEach((doc) => {
-                    if (
-                        !profile?.liked.includes(doc.id) && 
-                        !profile?.disliked.includes(doc.id) &&
-                        !profile?.friendList.map(
-                            (friend) => friend.id
-                        ).includes(doc.id) &&
-                        profile.interestedType.includes(doc.data().sex) &&
-                        doc.data().interestedType.includes(profile.sex) &&
-                        !doc.data().disliked.includes(profile.id)
-                        ) {
-                        list.push({
-                            id: doc.id,
-                            ...doc.data(),
-                        });
-                    }
-                    list.sort((a, b) => {
-                        if (b) {
-                            return a?.createdAt.toDate() - b.createdAt.toDate();
+    useFocusEffect(
+        useCallback(() => {
+            if (!profile) return;
+            const unsubscribe = firestore()
+                .collection("users")
+                .where(firestore.FieldPath.documentId(), "!=", profile.id)
+                .onSnapshot((querySnapshot) => {
+                    const list: FireDoc[] = [];
+                    querySnapshot.forEach((doc) => {
+                        if (
+                            !profile?.liked.includes(doc.id) && 
+                            !profile?.disliked.includes(doc.id) &&
+                            !profile?.friendList.map(
+                                (friend) => friend.id
+                            ).includes(doc.id) &&
+                            profile.interestedType.includes(doc.data().sex) &&
+                            doc.data().interestedType.includes(profile.sex) &&
+                            !doc.data().disliked.includes(profile.id)
+                            ) {
+                            list.push({
+                                id: doc.id,
+                                ...doc.data(),
+                            });
                         }
-                        return 0;
+                        list.sort((a, b) => {
+                            if (b) {
+                                return a?.createdAt.toDate() - b.createdAt.toDate();
+                            }
+                            return 0;
+                        });
                     });
+                    setUsers(list);
+                    setLoading(false);
+                }, (error) => {
+                    onError && onError("Error fetching users");
+                    console.log("[LOG] error fetching users:", error);
                 });
-                setUsers(list);
-                setLoading(false);
-            }, (error) => {
-                onError && onError("Error fetching users");
-                console.log("[LOG] error fetching users:", error);
-            });
-        return (()=>{
-            unsubscribe();
-        })
-    }, [
-        profile?.id,
-        profile?.liked,
-        profile?.disliked,
-        profile?.interestedType,
-        profile?.messagingFriendList,
-    ]);
+            return unsubscribe;
+        }, [
+            profile?.id,
+            profile?.liked,
+            profile?.disliked,
+            profile?.interestedType,
+            profile?.messagingFriendList,
+        ])
+    );
+
     return {
 
         /** result after look */
