@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image } from 'react-native'
+import { Text, Box, Image } from 'native-base';
 import React from 'react'
 import Images from '@app/theme/images';
 
@@ -8,28 +8,26 @@ import Images from '@app/theme/images';
  */
 const RegistrationHeader = () => {
     return (
-        <View
-        style = { styles.container }
+        <Box
+            flexDirection="column"
         >
-            <Image source={Images.logo} />
-            <Text style = { styles.title }>
+            <Image 
+                width={150}
+                height={150}
+                source={Images.logo} 
+                alt="logo"
+                alignSelf="center"
+            />
+            <Text
+                fontWeight="bold"
+                color="white"
+                textAlign="center"
+                fontSize="4xl"
+            >
                 AstroMagnet
             </Text>
-        </View>
+        </Box>
     )
 }
 
 export default RegistrationHeader
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: "center",
-        maxHeight: "80%"
-    },
-    title: {
-        fontSize: 50,
-        fontWeight: "bold",
-        color: "white"
-    }
-})

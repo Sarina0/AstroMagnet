@@ -1,6 +1,5 @@
 import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
 
-
 /**
  * User profile type
  * @property {string?} id - User id
@@ -12,7 +11,7 @@ import { FirebaseFirestoreTypes } from "@react-native-firebase/firestore";
  * @property {Date | null} dateAndTimeOfBirth - user's date and time of birth
  * @property {string?} placeOfBirth - user's place of birth
  * @property {SexType?} interestedType - user's interested sex type
- * @property {Friend[]} messagingFriendList - user's messaging friend list
+ * @property {string[]} messagingFriendList - chat room ids
  */
 export interface User {
     id?: string;
@@ -42,9 +41,8 @@ export interface User {
  * @property {string} chatroomId of friend and user
  */
 export interface Friend {
-    email: string;
-    name: string;
-    chatRoomId: string;
+    id: string, 
+    chatRoomId?: string
 }
 
 export namespace User {

@@ -1,4 +1,4 @@
-import {Text, Box, Pressable} from "native-base";
+import {Text, Box } from "native-base";
 import { ViewStyle } from "react-native";
 import DatePicker from "react-native-date-picker";
 import {ReactNode, useState} from "react";
@@ -24,7 +24,7 @@ const TimeText = (props: {
     return (
         <Text
             color="onSecondary"
-            fontSize={18}
+            fontSize="md"
             fontWeight="bold"
             onPress={props.openPicker}
         >
@@ -46,7 +46,7 @@ const PlaceholderText = (props: {
     return (
         <Text
             color="indigo.900"
-            fontSize={18}
+            fontSize="md"
             fontWeight="bold"
             onPress={props.openPicker}
         >
@@ -142,7 +142,7 @@ export default function DatePickerComponent(props: Props) {
         >
             { props.label && 
                 <Text
-                    fontSize={20}
+                    fontSize="md"
                     color="onSecondary"
                     fontWeight="bold"
                     mb={2}
@@ -195,6 +195,7 @@ export default function DatePickerComponent(props: Props) {
                 onConfirm={comfirmDateTime}
                 onCancel={toggleDatePicker}
                 mode="date"
+                textColor="#B4AEAE"
             />
             <DatePicker
                 modal
@@ -204,6 +205,7 @@ export default function DatePickerComponent(props: Props) {
                 onCancel={toggleTimePicker}
                 mode="time"
                 is24hourSource="locale"
+                textColor="#000000"
             />
         </Box>
     );

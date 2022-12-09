@@ -1,4 +1,4 @@
-import { Pressable, Text, View, Image } from "react-native";
+import { Pressable, Text, Image, Box } from "native-base";
 import { signInWithGoogle } from "@app/controller/auth";
 import Images from "@app/theme/images";
 
@@ -8,22 +8,40 @@ interface Props {
 
 export default function SignInButton(props: Props) {
     return (
-        <View className="flex-1 justify-end p-14 flex-col items-center">
+        <Box 
+            flex={1}
+            justifyContent="flex-end"
+            alignItems="center"
+            pb={10}
+        >
             <Pressable
-                className="flex-row items-center justify-between bg-purple-600/30 p-3"
                 onPress={signInWithGoogle.bind(null, props.onError)}
+                justifyContent="center"
+                alignItems="center"
+                backgroundColor="secondaryOpaque"
+                flexDirection="row"
+                paddingX={5}
+                paddingY={2}
+                rounded="md"
             >
-                <View className="flex items-center">
+                <Box>
                     <Image
                         source={Images.google_icon}
-                        className="w-8 h-8"
+                        width={10}
+                        height={10}
+                        mr={2}
+                        alt="google icon"
                         resizeMode="contain"
                     />
-                </View>
-                <Text className="text-white font-bold text-lg">
-                    Get started with Google
+                </Box>
+                <Text
+                    color="white"
+                    fontSize="md"
+                    fontWeight="bold"
+                >
+                    get start with Google
                 </Text>
             </Pressable>
-        </View>
+        </Box>
     );
 }

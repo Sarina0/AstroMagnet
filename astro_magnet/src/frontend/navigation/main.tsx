@@ -62,10 +62,10 @@ export default function MainNavigation() {
                                 name="Search"
                                 component={LookingScreen}
                                 options = {{
-                                    tabBarLabel: 'Search',
+                                    tabBarLabel: 'Browse',
                                     tabBarIcon: ({ color }) => (
                                         <MaterialCommunityIcons 
-                                            name="magnify" 
+                                            name="cards" 
                                             color={color} 
                                             size={26} 
                                         />

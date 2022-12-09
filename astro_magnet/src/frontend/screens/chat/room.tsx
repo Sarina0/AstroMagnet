@@ -8,20 +8,26 @@ import Input from "@app/frontend/components/chat/chatInput";
 import Dialog from "@app/frontend/components/chat/dialog";
 import LoadingOverlay from "@app/frontend/components/LoadingOverlay";
 import { sendMessage } from "@app/controller/message";
-import type { Message } from "@app/shared/interfaces/message";
+import type { ChatRoom, Message } from "@app/shared/interfaces/message";
 import { UserContext } from "@app/context/user";
 import firestore from "@react-native-firebase/firestore";
 import {AutoScrollFlatList} from "react-native-autoscroll-flatlist";
 import useKeyboardHeight from "@app/hooks/useKeyboardHeight";
 import useKeyboard from "@app/hooks/useKeyboard";
 import { ColorPalette } from "@app/theme/colors";
+import useUser from "@app/hooks/useUser";
 
-export default function Room(props: {route: {params: {id: string}}}) {
+/**
+ * screen to display a specific chat room
+ * @returns {JSX.Element} - chat room screen
+ */
+export default function Room(props: {room: ChatRoom}) {
+    const { room } = props;
     const toast = useToast();
     const listRef = useRef<AutoScrollFlatList<Message>>(null);
     const [page, setPage] = useState(1);
     const { messages, loading } = useMessage(
-        props.route.params.id,
+        room.id!,
         page,
         (error) => {
             toast.show({
@@ -47,6 +53,10 @@ export default function Room(props: {route: {params: {id: string}}}) {
         )
     }, []);
 
+    const friend = room.users.find((user) => user.id !== profile?.id);
+
+    const { user, loading: userLoading } = useUser(friend?.id!);
+
     //hooks to detect message loaded the first time
     const [firstLoad, setFirstLoad] = useState(true);
     useEffect(() => {
@@ -54,7 +64,6 @@ export default function Room(props: {route: {params: {id: string}}}) {
             setFirstLoad(false);
         }
     }, [firstLoad, loading]);
-
 
     //keep track of keyboard height
     const [isKeyboardShow, setIsKeyboardShow] = useState<boolean>(false);
@@ -76,12 +85,9 @@ export default function Room(props: {route: {params: {id: string}}}) {
         if (!profile) return;
         if (message.length > 0) {
             const newMessage: Message = {
-                chatRoomId: props.route.params.id,
+                chatRoomId: room.id!,
                 sendBy: {
-                    id: profile.id!,
-                    name: profile.name!,
-                    profilePicture: profile.profilePicture!,
-                    email: profile.email!,
+                    id: profile.id!
                 },
                 content: message,
                 timestamp: new Date(),
@@ -98,16 +104,18 @@ export default function Room(props: {route: {params: {id: string}}}) {
         return;
     }
 
+    if (loading || userLoading) return <LoadingOverlay />
+
     return (
         <SafeAreaView className="flex-1">
-            {loading && <LoadingOverlay/>}
             <AutoScrollFlatList
                 data={messages}
                 ref={listRef}
                 initialNumToRender={10}
                 renderItem={({item}) => 
                     <Dialog
-                        {...item}
+                        message={item}
+                        chatUsers={[profile!, user!]}
                     />
                 }
                 contentContainerStyle={{

@@ -2,10 +2,17 @@ import {User} from "../interfaces/user";
 
 const sexes = ["male", "female", "other"];
 
+/**
+ * validate an user object
+ * @param user - user to validate
+ * @param {(message: string)=>void} onError - callback to call if validation failed
+ * @param {boolean} validateEmail - if true validate user email(default: false)
+ * @returns 
+ */
 export const validateUser = (
     user: Partial<User>, 
     onError?: (message: string)=> void,
-    validateEmail?: boolean,
+    validateEmail: boolean = false,
     
 ) => {
 

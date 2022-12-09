@@ -1,6 +1,6 @@
-import { StyleSheet, Text, TouchableOpacity, Image } from 'react-native'
 import React from 'react'
-import { ColorPalette } from '@app/theme/colors';
+import {Box, Text, Image} from "native-base";
+import {Dimensions} from "react-native";
 
 /**
  * props type for PageHeader component
@@ -16,41 +16,41 @@ interface Props {
  * @returns 
  */
 const PageHeader = (props: Props) => {
+    const width=Dimensions.get('window').width;
+    const fontSize = width > 400 ? 25 : width > 300 ? 20 : 15;
     return (
-        <TouchableOpacity
-            style = { styles.container }
-            onPress={props.onPress}
+        <Box
+            flexDirection="row"
+            alignItems="center"
+            paddingX={2}
+            width="100%"
         >
-            <Image
-                style = { styles.logo }
-                source = { require("../../../../assets/logo.png")}
-            />
-            <Text
-                style = { styles.title }
+            <Box
+                flex={1}
             >
-                AstroMagnet
-            </Text>
-        </TouchableOpacity>
+                <Image
+                    width={70}
+                    height={70}
+                    source = { require("../../../../assets/logo.png")}
+                    alt="logo"
+                    resizeMode="contain"
+                />
+            </Box>
+            <Box
+                flex={2}
+            >
+                <Text
+                    fontWeight="bold"
+                    color="tertiary"
+                    fontSize={fontSize}
+                    textAlign="center"
+                >
+                    AstroMagnet
+                </Text>
+            </Box>
+            <Box flex={0.5}></Box>
+        </Box>
     )
 }
 
 export default PageHeader
-
-const styles = StyleSheet.create({
-    container: {
-        flexDirection: "row",
-        alignItems: "center",
-        paddingLeft: 20,
-    },
-    logo: {
-        paddingLeft: 30,
-        width: 80,
-        height: 80
-    },
-    title: {
-        paddingLeft: 20,
-        fontSize: 35,
-        fontWeight: "bold",
-        color: ColorPalette.DESATURATED_MAGENTA
-    }
-})

@@ -1,9 +1,9 @@
 import {
-    StyleSheet, Text, 
+    StyleSheet,
     View, Image, 
     FlatList, TextInput
 } from 'react-native'
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ColorPalette } from "@app/theme/colors";
 import Images from "@app/theme/images";
 import EmptyView from "@app/frontend/components/EmptyView";
@@ -14,19 +14,15 @@ import useLiked from '@app/hooks/useLiked';
 import {useToast} from "native-base";
 import ToastDialog from '@app/frontend/components/global/toast';
 import type { User } from "@app/shared/interfaces/user";
-import FriendCard from '@app/frontend/components/friendCard';
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "@app/frontend/navigation/main";
-import { createRoom } from "@app/controller/message";
-import {UserContext} from "@app/context/user";
+import FriendCard from '@app/frontend/components/global/friendCard';
+import Title from "@app/frontend/components/global/title";
 
-type NavigationProps = NativeStackNavigationProp<RootStackParamList, "Like">;
-
+/**
+ * screen to display all users that user liked
+ * @returns {JSX.Element} liked screen
+ */
 const LikedScreen = () => {
-    const {profile} = useContext(UserContext)
     const toast = useToast();
-    const navigation = useNavigation<NavigationProps>();
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const {likedUsers, loading} = useLiked(
         (error) => {
@@ -39,23 +35,6 @@ const LikedScreen = () => {
 
     const onSearchUser = (text: string) => {
         setKeyword(text);
-    }
-
-    const onCardClick = async (user: User) =>  {
-        if (!profile) return;
-        const roomId = await createRoom(profile, user, (error) => {
-            toast.show({
-                render: () => <ToastDialog message={error} />
-            })
-        });
-        navigation.navigate("Chat", {
-            screen: "room",
-            params: {
-                id: roomId,
-                name: user.name!,
-                profilePic: user.profilePicture!
-            }
-        });
     }
 
     useEffect(()=> {
@@ -88,7 +67,7 @@ const LikedScreen = () => {
                         onChangeText = {onSearchUser}
                     />
                 </View>
-                <Text style={styles.bannerText} className="text-onSecondary">Liked People</Text>
+                <Title title="Liked People" />
                 {filteredUsers && filteredUsers.length > 0 ? (
                     <FlatList
                         style={styles.listView}
@@ -100,7 +79,6 @@ const LikedScreen = () => {
                                 <FriendCard
                                     profilePicture={item.profilePicture!}
                                     personName={item.name!}
-                                    onPress={() => onCardClick(item)}
                                 />
                             );
                         }}

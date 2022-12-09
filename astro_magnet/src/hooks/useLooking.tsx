@@ -16,6 +16,7 @@ export default function useLooking(
     const [users, setUsers] = useState<FireDoc[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const { profile } = useContext(UserContext);
+
     useEffect(() => {
         if (!profile) return;
         const unsubscribe = firestore()
@@ -27,9 +28,9 @@ export default function useLooking(
                     if (
                         !profile?.liked.includes(doc.id) && 
                         !profile?.disliked.includes(doc.id) &&
-                        !profile?.messagingFriendList.map(
-                            (friend) => friend.email
-                        ).includes(doc.data().email) &&
+                        !profile?.friendList.map(
+                            (friend) => friend.id
+                        ).includes(doc.id) &&
                         profile.interestedType.includes(doc.data().sex) &&
                         doc.data().interestedType.includes(profile.sex) &&
                         !doc.data().disliked.includes(profile.id)
@@ -52,7 +53,9 @@ export default function useLooking(
                 onError && onError("Error fetching users");
                 console.log("[LOG] error fetching users:", error);
             });
-        return unsubscribe;
+        return (()=>{
+            unsubscribe();
+        })
     }, [
         profile?.id,
         profile?.liked,

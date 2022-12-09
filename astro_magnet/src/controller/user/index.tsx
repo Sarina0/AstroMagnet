@@ -106,17 +106,94 @@ export default class UserController {
     static async likeUser(
         currentUserId: string, 
         userId: string, 
+        onMatched?: () => void,
         onError?: (message: string) => void
     ): Promise<void> {
-        await firestore()
+        let isMatched = false;
+
+        //current user ref in firestore
+        const currentUserRef = firestore()
             .collection('users')
-            .doc(currentUserId)
-            .update({
-                liked: firestore.FieldValue.arrayUnion(userId),
-            }).catch((error)=> {
-                console.log("[LOG] error liking user:", error)
+            .doc(currentUserId);
+
+        //user to be liked ref in firestore
+        const likeUserRef = firestore()
+            .collection('users')
+            .doc(userId);
+        const batch = firestore().batch();
+
+        const likeUser = await likeUserRef.get().catch((error)=>{
+            console.log("[LOG] error like user:", error)
+            onError && onError(error.message)
+        });
+        const currentUser = await currentUserRef.get().catch((error)=>{
+            console.log("[LOG] error like user:", error)
+            onError && onError(error.message)
+        });
+
+        if(likeUser && currentUser) {
+
+            //check if current user is already liked by the liked user
+            if (likeUser.data()?.liked.includes(currentUserId)) {
+
+                //move liked user to current user friend list
+                batch.update(currentUserRef, {
+                    friendList: firestore.FieldValue.arrayUnion({
+                        id: likeUser.id,
+                    }),
+                })
+
+                //move current user to liked user friend list
+                batch.update(likeUserRef, {
+                    friendList: firestore.FieldValue.arrayUnion({
+                        id: currentUser.id,
+                    }),
+                });
+
+                //remove current user from liked user liked list
+                batch.update(likeUserRef, {
+                    liked: firestore.FieldValue.arrayRemove(currentUserId),
+                });
+                isMatched = true;
+            } else {
+
+                //update current user liked array
+                batch.update(currentUserRef, {
+                    liked: firestore.FieldValue.arrayUnion(userId),
+                })
+            }
+
+            //execute batch
+            await batch.commit().catch((error) => {
+                console.log("[LOG] error like user:", error)
                 onError && onError(error.message)
-            })
+            });
+
+            //if matched
+            if (isMatched) {
+                onMatched && onMatched();
+            }
+        }
+    }
+
+    /**
+     * get user by id
+     * @param {string} id - user id
+     * @returns returns user data
+     */
+    static async getUserById(id: string): Promise<User | undefined> {
+        return await firestore()
+            .collection('users')
+            .doc(id)
+            .get()
+            .then((documentSnapshot) => {
+                if (documentSnapshot.exists) {
+                    return {
+                        ...documentSnapshot.data(),
+                        id: documentSnapshot.id,
+                    } as User;
+                }
+            });
     }
 
     /**

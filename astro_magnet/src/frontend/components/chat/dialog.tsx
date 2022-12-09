@@ -3,41 +3,39 @@ import type { Message } from "@app/shared/interfaces/message";
 import { useContext } from "react";
 import { UserContext } from "@app/context/user";
 import { formatChatTime } from "@app/shared/actions/time";
-import Image from "../global/image";
+import Avatar from "../global/avatar";
+import type { User } from "@app/shared/interfaces/user";
+
+interface Props {
+    message: Message,
+    chatUsers: User[]
+}
 
 /**
  * Chat box component
  * @props {Message} pass in the message as props
  * @returns {JSX.Element} returns the chat box component
  */
-export default function Dialog(props: Message) {
+export default function Dialog(props: Props) {
     const { profile } = useContext(UserContext);
     if (!profile) {
         return null;
     }
-    const {content, sendBy, createdAt} = props;
+    const { content, sendBy, createdAt } = props.message;
     const isCurrentUser = sendBy.id === profile.id;
+    const sendByUser = props.chatUsers.find((user) => user.id === sendBy.id);
     return (
         <Box
             flexDirection={isCurrentUser ? "row-reverse" : "row"}
             alignItems={"center"}
         >
             <Box 
-                width={50}
-                height={50}
-                rounded="full"
-                overflow="hidden"
                 mr={isCurrentUser ? 2 : 3}
                 ml={isCurrentUser ? 3 : 2}
-                alignSelf={"flex-start"}
             >
-                <Image
-                    src={sendBy.profilePicture}
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                    }}
-                    resizeMode="cover"
+                <Avatar
+                    src={sendByUser?.profilePicture!}
+                    size="sm"
                 />
             </Box>
             <Box

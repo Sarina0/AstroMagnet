@@ -38,7 +38,7 @@ export default function SelectComponent(props: Props) {
             <Text
                 color="onSecondary"
                 mb={2}
-                fontSize={20}
+                fontSize="md"
                 fontWeight="bold"
             >
                 {props.label}
@@ -54,7 +54,7 @@ export default function SelectComponent(props: Props) {
                 borderRadius={7}
                 borderColor="transparent"
                 alignItems="center"
-                fontSize={18}
+                fontSize="md"
                 fontWeight="bold"
                 dropdownIcon={<ChevronDownIcon size={5} color="indigo.900" mr={2}/>}
                 _selectedItem={{
