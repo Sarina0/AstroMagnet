@@ -1,4 +1,4 @@
-import {Text, Box, Pressable} from "native-base";
+import {Text, Box } from "native-base";
 import { ViewStyle } from "react-native";
 import DatePicker from "react-native-date-picker";
 import {ReactNode, useState} from "react";
@@ -195,6 +195,7 @@ export default function DatePickerComponent(props: Props) {
                 onConfirm={comfirmDateTime}
                 onCancel={toggleDatePicker}
                 mode="date"
+                textColor="#B4AEAE"
             />
             <DatePicker
                 modal
@@ -204,6 +205,7 @@ export default function DatePickerComponent(props: Props) {
                 onCancel={toggleTimePicker}
                 mode="time"
                 is24hourSource="locale"
+                textColor="#000000"
             />
         </Box>
     );
