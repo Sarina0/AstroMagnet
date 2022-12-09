@@ -11,6 +11,7 @@ import PageHeader from '@app/frontend/components/global/header';
 import Card from "@app/frontend/components/looking/swipeable";
 import ModalDialog from '@app/frontend/components/global/modal';
 import type {User} from "@app/shared/interfaces/user";
+import LoadingOverlay from '@app/frontend/components/LoadingOverlay';
 
 /**
  * screen for looking for new friends
@@ -57,6 +58,15 @@ const LookingScreen = () => {
                 });
             }
         );
+    }
+
+    if (loading) {
+        return (
+            <SafeArea>
+                <PageHeader/>
+                <LoadingOverlay />
+            </SafeArea>
+        )
     }
 
     return (
