@@ -13,6 +13,11 @@ export default function useFriends() {
 
     useEffect(() => {
         if (!profile) return;
+        if (!profile.friendList || profile.friendList.length === 0) {
+            setFriends([]);
+            setLoading(false);
+            return;
+        }
         const userFriendIds = profile.friendList.map((friend) => friend.id);
         const unsubscribe = firestore()
             .collection('users')

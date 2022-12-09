@@ -48,7 +48,9 @@ export default function useChatChannels(
                     console.log("[ERROR] error fetching chatrooms:", error);
                 });
         return unsubscribe;
-    },[profile?.messagingFriendList])
+    },[
+        profile
+    ])
     return {
         channels,
         loading

@@ -29,8 +29,8 @@ export default function useLooking(
                         !profile?.liked.includes(doc.id) && 
                         !profile?.disliked.includes(doc.id) &&
                         !profile?.friendList.map(
-                            (friend) => friend.email
-                        ).includes(doc.data().email) &&
+                            (friend) => friend.id
+                        ).includes(doc.id) &&
                         profile.interestedType.includes(doc.data().sex) &&
                         doc.data().interestedType.includes(profile.sex) &&
                         !doc.data().disliked.includes(profile.id)
