@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext,useCallback, useEffect } from 'react';
 import {UserContext} from '@app/context/user';
 import { StyleSheet, View } from 'react-native'
 import PageHeader from '@app/frontend/components/global/header'
@@ -17,6 +17,7 @@ import DatePicker from '@app/frontend/components/global/datepicker';
 import { validateUser } from '@app/shared/actions/validation';
 import ToastDialog from '@app/frontend/components/global/toast';
 import { useToast, ScrollView } from 'native-base';
+import { useFocusEffect } from '@react-navigation/native';
 
 /**
  * user profile screen where user can update his/her profile
@@ -47,6 +48,19 @@ const ProfileScreen = () => {
     );
     const [ loading, setLoading ] = useState(false);
     const toast = useToast();
+
+    useFocusEffect(
+        useCallback(()=>{
+            return (()=>{
+                setDate(currentUser?.dateAndTimeOfBirth ?? null);
+                setName(currentUser?.name ?? "");
+                setSex(currentUser?.sex ?? null);
+                setInterest(currentUser?.interestedType ?? []);
+                setBirthPlace(currentUser?.placeOfBirth ?? "");
+                setUpdatedPic(undefined);
+            })
+        }, [])
+    )
 
     //list of items for select components
     const selectItems = User.sexes.map(sex=>({
