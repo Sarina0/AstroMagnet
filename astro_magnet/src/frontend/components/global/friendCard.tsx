@@ -58,27 +58,24 @@ const FriendCard = (props: Props) => {
                 >
                     { personName }
                 </Text>
-                <Box
+                { props.lastMessage && <Box
                     flexDirection="row"
                     ml={5}
                     mt={2}
                     width="full"
                     alignItems="center"
                 >
-                    {
-                        props.lastMessage && (
-                            <Text
-                                fontSize="sm"
-                                color="indigo.900"
-                                ellipsizeMode='tail'
-                                flex={0.35}
-                                numberOfLines={1}
-                                isTruncated
-                            >
-                                { props.lastMessage }...
-                            </Text>
-                        )
-                    }
+                    
+                    <Text
+                        fontSize="sm"
+                        color="indigo.900"
+                        ellipsizeMode='tail'
+                        flex={0.35}
+                        numberOfLines={1}
+                        isTruncated
+                    >
+                        { props.lastMessage }...
+                    </Text>
                     {
                         lastMessageTime &&
                         <Text
@@ -89,7 +86,7 @@ const FriendCard = (props: Props) => {
                             { lastMessageTime }
                         </Text>
                     }
-                </Box>
+                </Box>}
             </Box>
         </Pressable>
     )
