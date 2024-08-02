@@ -54,5 +54,9 @@ cd ios && pod install
 cd ../
 npx expo run:ios
 ```
+# Download 
+Here is the [link](https://drive.google.com/file/d/1M5DoKTKiYn5azwemw1zSJZvEUex2iQ4z/view?usp=sharing) to the apk file of **AstroMagnet**!
+For a free online Android Emulator download the [ApkOnline APK manager for Android emulator Chrom extentinon](https://chromewebstore.google.com/detail/apkonline-apk-manager-for/lnhnebkkgjmlgomfkkmkoaefbknopmja). 
+Add your apk file to the file manager and from there run ***AstroMagnet***
 
-- Let me know if theres any problem on Discord 🦊 
+- Let me know if theres any problem on Discord 🦊 sarina7426
