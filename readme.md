@@ -1,4 +1,12 @@
 # Astromagnet
+AstroMagnet is a cutting-edge matchmaking mobile application that leverages astrology to find and connect users based on their astrological compatibility scores. Developed with React Native and Expo, AstroMagnet offers a seamless user experience across platforms. Key features of the application include:
+
+Astrological Compatibility Scoring: Matches users based on detailed astrological rules.
+Google Sign-In Integration: Provides secure and convenient authentication, storing only tokens for enhanced security.
+Profile Management: Allows users to create and update their profiles easily.
+Matchmaking: Features intuitive like and dislike icons to facilitate connections.
+Matched User Search: Enables users to search and view profiles of users they've already matched with.
+Real-Time Chat: Allows users to start conversations with their matches.
 ## Setup: 
 1. run: 
 ```bat
